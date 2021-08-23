@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31605.320
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphPermissionParser", "GraphPermissionParser\GraphPermissionParser.csproj", "{A30C391A-2B5C-47F0-9C02-85F90168E2F4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A30C391A-2B5C-47F0-9C02-85F90168E2F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A30C391A-2B5C-47F0-9C02-85F90168E2F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A30C391A-2B5C-47F0-9C02-85F90168E2F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A30C391A-2B5C-47F0-9C02-85F90168E2F4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {54C49DAA-62AA-455C-A811-09FF4782E339}
+	EndGlobalSection
+EndGlobal
