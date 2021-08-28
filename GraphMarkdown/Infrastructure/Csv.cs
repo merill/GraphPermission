@@ -8,7 +8,7 @@ namespace GraphMarkdown.Infrastructure
 {
     public static class Csv
     {
-        public static void SavePermissionsToCsv(List<GraphPermission> permissions, string filePath)
+        public static void SavePermissionsToCsv(List<DocGraphPermission> permissions, string filePath)
         {
             using var writer = new StreamWriter(filePath);
             using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);

@@ -13,7 +13,7 @@ namespace GraphMarkdown
     public class GraphDocParser
     {
 
-        public List<GraphPermission> GetPermissionsInFile(string filePath)
+        public List<DocGraphPermission> GetPermissionsInFile(string filePath)
         {
             var md = File.ReadAllText(filePath);
             var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
@@ -25,7 +25,7 @@ namespace GraphMarkdown
                                     && p.Descendants<LiteralInline>().FirstOrDefault().Content.ToString() == "Permission type"
                                  select p;
 
-            var permissions = new List<GraphPermission>();
+            var permissions = new List<DocGraphPermission>();
             var codeBlock = doc.Descendants<FencedCodeBlock>().First();
             var httpRequests = codeBlock.Lines.ToString().Split(Environment.NewLine);
 
@@ -48,12 +48,12 @@ namespace GraphMarkdown
                                     {
                                         if (!string.IsNullOrWhiteSpace(httpRequest))
                                         {
-                                            permissions.Add(new GraphPermission()
+                                            permissions.Add(new DocGraphPermission()
                                             {
                                                 PermissionType = permissionType,
-                                                Permission = perm.Trim(),
+                                                PermissionName = perm.Trim(),
                                                 HttpRequest = httpRequest,
-                                                SourceFile = filePath
+                                                SourceFile = Path.GetFileNameWithoutExtension(filePath)
                                             });
                                         }
                                     }
@@ -71,9 +71,9 @@ namespace GraphMarkdown
             return permissions;
         }
 
-        public List<GraphPermission> GetPermissionsInFolder(string folder)
+        public List<DocGraphPermission> GetPermissionsInFolder(string folder)
         {
-            List<GraphPermission> permissions = new();
+            List<DocGraphPermission> permissions = new();
 
             foreach (var filePath in Directory.GetFiles(folder))
             {
