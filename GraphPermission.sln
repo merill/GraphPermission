@@ -5,6 +5,8 @@ VisualStudioVersion = 16.0.31605.320
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphPermissionParser", "GraphPermissionParser\GraphPermissionParser.csproj", "{A30C391A-2B5C-47F0-9C02-85F90168E2F4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphMarkdown", "GraphMarkdown\GraphMarkdown.csproj", "{1C394181-BEC1-4983-B469-F9A16B9BB06D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{A30C391A-2B5C-47F0-9C02-85F90168E2F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A30C391A-2B5C-47F0-9C02-85F90168E2F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A30C391A-2B5C-47F0-9C02-85F90168E2F4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1C394181-BEC1-4983-B469-F9A16B9BB06D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C394181-BEC1-4983-B469-F9A16B9BB06D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C394181-BEC1-4983-B469-F9A16B9BB06D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C394181-BEC1-4983-B469-F9A16B9BB06D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

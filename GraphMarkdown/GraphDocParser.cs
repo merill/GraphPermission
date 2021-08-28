@@ -1,4 +1,5 @@
-﻿using Markdig;
+﻿using GraphMarkdown.Data;
+using Markdig;
 using Markdig.Extensions.Tables;
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
@@ -7,9 +8,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace GraphPermissionParser
+namespace GraphMarkdown
 {
-    internal class GraphDocParser
+    public class GraphDocParser
     {
 
         public List<GraphPermission> GetPermissionsInFile(string filePath)

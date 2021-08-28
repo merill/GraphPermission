@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace GraphPermissionParser
+﻿namespace GraphMarkdown.Data
 {
-    class GraphPermission
+    public class GraphPermission
     {
         public string SourceFile { get; set; }
         public string PermissionType { get; set; }

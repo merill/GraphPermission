@@ -1,11 +1,12 @@
 ﻿using CsvHelper;
+using GraphMarkdown.Data;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 
-namespace GraphPermissionParser
+namespace GraphMarkdown.Infrastructure
 {
-    class CsvHelper
+    public static class Csv
     {
         public static void SavePermissionsToCsv(List<GraphPermission> permissions, string filePath)
         {

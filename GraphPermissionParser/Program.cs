@@ -1,4 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using GraphMarkdown;
+using GraphMarkdown.Data;
+using GraphMarkdown.Infrastructure;
+using Microsoft.Extensions.Configuration;
+using System;
 using System.Threading.Tasks;
 
 namespace GraphPermissionParser
@@ -14,12 +18,29 @@ namespace GraphPermissionParser
             var filePath = @"F:\code\microsoft-graph-docs\api-reference\v1.0\api\intune-rbac-deviceandappmanagementroledefinition-delete.md";
             var permissions = parser.GetPermissionsInFile(filePath);
 
-            var mdg = new MarkdownGenerator();
+            var config = GetConfig();
+            var mdg = new MarkdownGenerator(config);
             var mdFolder = @"F:\temp\graphperms";
             var result = await mdg.GenerateAsync(permissions, mdFolder);
             var csvFilePath = @"F:\code\temp\graphperm.csv";
-            CsvHelper.SavePermissionsToCsv(permissions, csvFilePath);
+            Csv.SavePermissionsToCsv(permissions, csvFilePath);
 
+        }
+
+        private static Config GetConfig()
+        {
+            var config = new ConfigurationBuilder()
+                .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+                .AddJsonFile("appsettings.json")
+                .AddUserSecrets<Program>()
+                .Build();
+
+            return new Config()
+            {
+                ClientId = config.GetSection("ClientId").Value,
+                ClientSecret = config.GetSection("ClientSecret").Value,
+                Authority = config.GetSection("Authority").Value
+            };
         }
     }
 }
