@@ -3,7 +3,9 @@ using GraphMarkdown.Infrastructure;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -18,18 +20,97 @@ namespace GraphMarkdown
             _config = config;
         }
 
-        public async Task<bool> GenerateAsync(List<DocGraphPermission> docPermissions, string folderPath)
+        public async Task<bool> GenerateAsync(List<DocGraphPermission> docPermissions, string rootFolderPath)
         {
             var graphResponse = await GetGraphResponseObject();
             var permissionMap = MapPermissions(docPermissions, graphResponse);
 
-            foreach(var perm in permissionMap)
+            var permFolderPath = Path.Combine(rootFolderPath, "graphpermission");
+
+            foreach (var perm in permissionMap)
             {
-                CreateMarkdown(perm.Value, folderPath);
+                CreateMarkdown(perm.Value, permFolderPath);
             }
+
+            CreateTocMarkdown(permissionMap, rootFolderPath, permFolderPath);
+
             return true;
         }
 
+        private void CreateTocMarkdown(Dictionary<string, GraphPermissionMap> perms, string rootFolderPath, string permFolderPath)
+        {
+            var sbYml = new StringBuilder();
+            var sbIndex = new StringBuilder();
+
+            sbIndex.AppendLine("# Microsoft Graph Permission API"); sbIndex.AppendLine();
+            sbIndex.AppendLine("Click through to a Graph Permission to view the APIs that can be called when the permission is consented to an application in your tenant."); sbIndex.AppendLine();
+
+            sbIndex.AppendLine("# Permission Scopes"); sbIndex.AppendLine();
+
+            sbYml.AppendLine($"- name: Overview");
+            sbYml.AppendLine($"  href: index.md");
+            var lastPermission = "";
+
+            foreach (var perm in perms.OrderBy(i => i.Value.PermissionName))
+            {
+                var permName = perm.Value.PermissionName;
+                var url = UrlEncoder.Default.Encode(permName);
+
+                var permShortName = permName.Split(".")[0];
+                if (lastPermission != permShortName)
+                {
+                    lastPermission = permShortName;
+                    sbYml.AppendLine($"- name: {permShortName}");
+                    sbYml.AppendLine($"  items:");
+                }
+
+                sbYml.AppendLine($"  - name: {permName}");
+                sbYml.AppendLine($"    href: {url}.md");
+
+                sbIndex.AppendLine($"* [{perm.Value.PermissionName}]({url}.md)");
+            }
+
+            CreateFile(permFolderPath, "toc.yml", sbYml.ToString());
+            CreateFile(permFolderPath, "index.md", sbIndex.ToString());
+            CreateFile(rootFolderPath, "index.md", sbIndex.ToString().Replace("(", "(graphpermission/"));
+
+            var rootToc = @"
+- name: Graph Permissions
+  href: graphpermission/
+  homepage: graphpermission/index.md
+- name: About
+  href: about/
+  homepage: about/index.md
+";
+
+            CreateFile(rootFolderPath, "toc.yml", rootToc);
+            var about = @"
+# About
+While the [Microsoft Graph reference page](https://docs.microsoft.com/en-us/graph/permissions-reference) provides a good summary of all the permissions it's not easy to find out the APIs and data that are made available when a consent is provided to an application.
+
+This site will help you quickly get a list of all the APIs for a given Graph permission scope.
+
+Please submit feedback and any issues [here](https://github.com/merill/tbd).
+";
+
+            CreateFile(Path.Combine(rootFolderPath, "about"), "index.md", about);
+
+            var contentFolder = Path.Combine(Directory.GetCurrentDirectory(), "Content");
+
+            CopyFile(contentFolder, rootFolderPath, "docfx.json");
+        }
+
+        private void CopyFile(string sourceFolder, string targetFolder, string sourceFileName)
+        {
+            File.Copy(Path.Combine(sourceFolder, sourceFileName), Path.Combine(targetFolder, sourceFileName), true);
+        }
+
+        private void CreateFile(string folderPath, string fileName, string content)
+        {
+            new DirectoryInfo(folderPath).Create();
+            var filePath = Path.Combine(folderPath, fileName);
+            File.WriteAllText(filePath, content);
+        }
         private void CreateMarkdown(GraphPermissionMap perm, string folderPath)
         {
             var sb = new StringBuilder();

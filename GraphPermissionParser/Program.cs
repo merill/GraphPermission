@@ -20,7 +20,7 @@ namespace GraphPermissionParser
 
             var config = GetConfig();
             var mdg = new MarkdownGenerator(config);
-            var mdFolder = @"F:\code\temp\graphpermdoc";
+            var mdFolder = @"F:\Code\temp\graphpermdoc\docfx_project";
             var result = await mdg.GenerateAsync(permissions, mdFolder);
             var csvFilePath = @"F:\code\temp\graphperm.csv";
             Csv.SavePermissionsToCsv(permissions, csvFilePath);

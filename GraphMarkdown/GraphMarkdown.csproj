@@ -3,6 +3,16 @@
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Content\docfx.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Content\docfx.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CsvHelper" Version="27.1.1" />
     <PackageReference Include="Markdig" Version="0.25.0" />
