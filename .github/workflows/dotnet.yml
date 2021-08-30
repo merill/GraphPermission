@@ -40,7 +40,7 @@ jobs:
         path: ./microsoft-graph-docs
     - name: run permission parser
       run: .\GraphPermission\outbin\GraphPermissionParser.exe 
-      shell: pwsh
+      shell: bash
     - name: show tree
       run: tree
       shell: pwsh
