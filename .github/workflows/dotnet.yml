@@ -29,7 +29,6 @@ jobs:
     
     steps:
     - uses: actions/checkout@master
-    - name: Clone Microsoft Graph Docs
       with:
         repository: microsoftgraph/microsoft-graph-docs
         path: ./microsoft-graph-docs
@@ -38,11 +37,4 @@ jobs:
       with:
         files: 'GraphPermissionParser/appsettings.json'
       env:
-        clientsecret: ${{ secrets.CLIENTSECRET }}
-    - name: run permission parser
-      run: .outbin\GraphPermissionParser.exe 
-      shell: pwsh
-    - name: show tree
-      run: tree
-      shell: pwsh
-      
+        clientsecret: ${{ secrets.CLIENTSECRET }}      
