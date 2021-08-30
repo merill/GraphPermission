@@ -60,13 +60,16 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         name: _site
+        path: _site
     - name: Show Working directory
       run: tree
-      shell: pwsh          
-    - name: Push to site report
-      uses: selenehyun/gh-push@master
+      shell: pwsh
+    - name: Publish site to repo
+      uses: cpina/github-action-push-to-another-repository@main
       env:
-        GITHUB_TOKEN: ${{ secrets.API_TOKEN_GITHUB }}
-        COMMIT_FILES: _site
-        REPO_FULLNAME: merill/graphpermissions.github.io
-        BRANCH: main
+        API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
+      with:
+        source-directory: '_site'
+        destination-github-username: 'merill'
+        destination-repository-name: 'graphpermissions.github.io'
+        target-branch: main
