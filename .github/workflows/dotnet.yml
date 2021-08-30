@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
     - uses: actions/checkout@v2
@@ -33,12 +33,17 @@ jobs:
       with:
         repository: microsoftgraph/microsoft-graph-docs
         path: ./microsoft-graph-docs
+    - name: Setup DocFX
+      uses: crazy-max/ghaction-chocolatey@v1
+      with:
+        args: install docfx
     - name: Show Working directory
       run: tree
-      shell: pwsh
-    - name: Check folder
-      run: dir .\outbin\
       shell: pwsh
     - name: run permission parser
       run: .\outbin\GraphPermissionParser "$(Get-Location)/microsoft-graph-docs/api-reference/v1.0/api" "$(Get-Location)\docfx_project"
       shell: pwsh
+    - name: DocFX Build
+      working-directory: docs
+      run: docfx docfx.json
+      continue-on-error: false
