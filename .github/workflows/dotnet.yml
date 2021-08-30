@@ -45,3 +45,12 @@ jobs:
       shell: pwsh
     - name: DocFX Build
       run: docfx .\docfx_project\docfx.json
+    - name: Push to site report
+      uses: cpina/github-action-push-to-another-repository@main
+      env:
+        API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
+      with:
+        source-directory: 'docfx_project\_site'
+        destination-github-username: 'merill'
+        destination-repository-name: 'graphpermissions.github.io'
+        target-branch: main
