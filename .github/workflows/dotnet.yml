@@ -12,6 +12,12 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: Update appsettings
+    - uses: microsoft/variable-substitution@v1
+      with:
+        files: 'GraphPermissionParser/appsettings.json'
+      env:
+        ClientSecret: ${{ secrets.CLIENTSECRET }}    
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
@@ -32,12 +38,6 @@ jobs:
       with:
         repository: microsoftgraph/microsoft-graph-docs
         path: ./microsoft-graph-docs
-    - uses: actions/checkout@v2
-    - uses: microsoft/variable-substitution@v1
-      with:
-        files: '.outbin/appsettings.json'
-      env:
-        ClientSecret: ${{ secrets.CLIENTSECRET }}      
     - name: run permission parser
       run: .outbin/GraphPermissionParser.exe 
       shell: pwsh
