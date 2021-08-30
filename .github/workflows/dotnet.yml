@@ -35,7 +35,6 @@ jobs:
         path: ./microsoft-graph-docs
     - uses: actions/checkout@v2
     - uses: microsoft/variable-substitution@v1
-    - name: Update appsetting
       with:
         files: 'GraphPermissionParser/appsettings.json'
       env:
