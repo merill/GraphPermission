@@ -36,9 +36,6 @@ jobs:
     - name: Show Working directory
       run: tree
       shell: pwsh
-    - name: Check Parser exe
-      run: dir .\outbin\GraphPermissionParser.exe
-      shell: pwsh
     - name: Check folder
       run: dir .\outbin\
       shell: pwsh
