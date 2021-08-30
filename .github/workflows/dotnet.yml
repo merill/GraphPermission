@@ -37,4 +37,10 @@ jobs:
       with:
         files: 'GraphPermissionParser/appsettings.json'
       env:
-        clientsecret: ${{ secrets.CLIENTSECRET }}      
+        ClientSecret: ${{ secrets.CLIENTSECRET }}      
+    - name: run permission parser
+      run: .outbin\GraphPermissionParser.exe 
+      shell: pwsh
+    - name: show tree
+      run: tree
+      shell: pwsh
