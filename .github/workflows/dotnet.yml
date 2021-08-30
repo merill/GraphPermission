@@ -19,7 +19,7 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build --no-restore
+      run: dotnet build --no-restore -o outbin
     - name: Test
       run: dotnet test --no-build --verbosity normal
 
@@ -29,12 +29,21 @@ jobs:
     
     steps:
     - uses: actions/checkout@master
+    - name: Clone Microsoft Graph Docs
       with:
         repository: microsoftgraph/microsoft-graph-docs
         path: ./microsoft-graph-docs
     - uses: actions/checkout@v2
     - uses: microsoft/variable-substitution@v1
+    - name: Update appsetting
       with:
-        files: 'appsettings.json'
-    env:
+        files: 'GraphPermissionParser/appsettings.json'
+      env:
         clientsecret: ${{ secrets.CLIENTSECRET }}
+    - name: run permission parser
+      run: .outbin\GraphPermissionParser.exe 
+      shell: pwsh
+    - name: show tree
+      run: tree
+      shell: pwsh
+      
