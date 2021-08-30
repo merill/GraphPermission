@@ -84,20 +84,20 @@ namespace GraphMarkdown
 ";
 
             CreateFile(rootFolderPath, "toc.yml", rootToc);
-            var about = @"
-# About
-While the [Microsoft Graph reference page](https://docs.microsoft.com/en-us/graph/permissions-reference) provides a good summary of all the permissions it's not easy to find out the APIs and data that are made available when a consent is provided to an application.
+//            var about = @"
+//# About
+//While the [Microsoft Graph reference page](https://docs.microsoft.com/en-us/graph/permissions-reference) provides a good summary of all the permissions it's not easy to find out the APIs and data that are made available when a consent is provided to an application.
 
-This site will help you quickly get a list of all the APIs for a given Graph permission scope.
+//This site will help you quickly get a list of all the APIs for a given Graph permission scope.
 
-Please submit feedback and any issues [here](https://github.com/merill/tbd).
-";
+//Please submit feedback and any issues [here](https://github.com/merill/tbd).
+//";
 
-            CreateFile(Path.Combine(rootFolderPath, "about"), "index.md", about);
+            //CreateFile(Path.Combine(rootFolderPath, "about"), "index.md", about);
 
-            var contentFolder = Path.Combine(Directory.GetCurrentDirectory(), "Content");
+            //var contentFolder = Path.Combine(Directory.GetCurrentDirectory(), "Content");
 
-            CopyFile(contentFolder, rootFolderPath, "docfx.json");
+            //CopyFile(contentFolder, rootFolderPath, "docfx.json");
         }
 
         private void CopyFile(string sourceFolder, string targetFolder, string sourceFileName)
