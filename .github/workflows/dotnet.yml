@@ -46,11 +46,9 @@ jobs:
     - name: DocFX Build
       run: docfx .\docfx_project\docfx.json
     - name: Push to site report
-      uses: cpina/github-action-push-to-another-repository@main
+      uses: selenehyun/gh-push@master
       env:
-        API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
-      with:
-        source-directory: 'docfx_project\_site'
-        destination-github-username: 'merill'
-        destination-repository-name: 'graphpermissions.github.io'
-        target-branch: main
+        GITHUB_TOKEN: ${{ secrets.API_TOKEN_GITHUB }}
+        COMMIT_FILES: docfx_project/_site
+        REPO_FULLNAME: merill/graphpermissions.github.io
+        BRANCH: main
