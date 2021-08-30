@@ -38,9 +38,8 @@ jobs:
       with:
         repository: microsoftgraph/microsoft-graph-docs
         path: ./microsoft-graph-docs
+    - name: Show Working directory
+      run: ls        
     - name: run permission parser
-      run: .\GraphPermission\outbin\GraphPermissionParser.exe 
+      run: ./GraphPermission/outbin/GraphPermissionParser.exe 
       shell: bash
-    - name: show tree
-      run: tree
-      shell: pwsh
