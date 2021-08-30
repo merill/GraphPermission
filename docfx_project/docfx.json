@@ -6,7 +6,6 @@
           "graphpermission/**.md",
           "graphpermission/**/toc.yml",
           "about/**.md",
-          "about/**/toc.yml",
           "toc.yml",
           "*.md"
         ]
@@ -23,10 +22,15 @@
     "globalMetadataFiles": [],
     "fileMetadataFiles": [],
     "template": [
-      "default"
+      "default",
+      "templates/minimal"
     ],
-    "postProcessors": [],
+    "postProcessors": ["ExtractSearchIndex"],
     "markdownEngineName": "markdig",
+    "globalMetadata": {
+      "_appTitle": "Graph Permissions",
+      "_enableSearch": "true"
+    },
     "noLangKeyword": false,
     "keepFileLink": false,
     "cleanupCacheHistory": false,
