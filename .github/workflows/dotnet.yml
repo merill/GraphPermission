@@ -40,10 +40,36 @@ jobs:
     - name: Show Working directory
       run: tree
       shell: pwsh
-    - name: run permission parser
+    - name: Create Graph Permission Docs
       run: .\outbin\GraphPermissionParser "$(Get-Location)/microsoft-graph-docs/api-reference/v1.0/api" "$(Get-Location)\docfx_project"
       shell: pwsh
     - name: DocFX Build
-      working-directory: docs
-      run: docfx docfx.json
-      continue-on-error: false
+      run: docfx .\docfx_project\docfx.json
+    - name: Archive _site
+      uses: actions/upload-artifact@v2
+      with:
+          name: _site
+          path: docfx_project/_site
+
+  deploy:
+    runs-on: ubuntu-latest  
+    needs: build
+    
+    steps:
+    - name: Download artifact
+      uses: actions/download-artifact@v2
+      with:
+        name: _site
+        path: _site
+    - name: Show Working directory
+      run: tree
+      shell: pwsh
+    - name: Publish site to repo
+      uses: cpina/github-action-push-to-another-repository@main
+      env:
+        API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
+      with:
+        source-directory: '_site'
+        destination-github-username: 'merill'
+        destination-repository-name: 'graphpermissions.github.io'
+        target-branch: main
