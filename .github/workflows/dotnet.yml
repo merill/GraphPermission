@@ -12,8 +12,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Update appsettings
     - uses: microsoft/variable-substitution@v1
+    - name: Update appsettings
       with:
         files: 'GraphPermissionParser/appsettings.json'
       env:
