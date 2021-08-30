@@ -153,8 +153,8 @@ namespace GraphMarkdown
                 sb.AppendLine($"* [{docPerm.HttpRequest}](https://docs.microsoft.com/en-us/graph/api/{docPerm.SourceFile}?view=graph-rest-1.0&tabs=http)");
                 sb.AppendLine();
             }
-            var filePath = Path.Combine(folderPath, $"{perm.PermissionName}.md");
-            File.WriteAllText(filePath, sb.ToString());
+
+            CreateFile(folderPath, $"{perm.PermissionName}.md", sb.ToString());
         }
 
         private static Dictionary<string, GraphPermissionMap> MapPermissions(List<DocGraphPermission> docPermissions, MicrosoftGraphObject graphResponse)
