@@ -38,6 +38,10 @@ namespace GraphMarkdown
                         var cells = row.Descendants<TableCell>().ToList();
                         var permissionType = cells[0].Descendants<LiteralInline>().FirstOrDefault().Content.ToString();
                         var permission = cells[1].Descendants<LiteralInline>().FirstOrDefault().Content.ToString();
+                        permission = permission
+                                        .Replace(" and ", ",")
+                                        .Replace(" or ", ",")
+                                        .Replace(" plus ", ",");
                         foreach (var perm in permission.Split(','))
                         {
                             if (!string.IsNullOrWhiteSpace(perm))

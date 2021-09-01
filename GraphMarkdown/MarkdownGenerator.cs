@@ -20,7 +20,7 @@ namespace GraphMarkdown
             _config = config;
         }
 
-        public async Task<bool> GenerateAsync(List<DocGraphPermission> docPermissions, string rootFolderPath)
+        public async Task<Dictionary<string, GraphPermissionMap>> GenerateAsync(List<DocGraphPermission> docPermissions, string rootFolderPath)
         {
             var graphResponse = await GetGraphResponseObject();
             var permissionMap = MapPermissions(docPermissions, graphResponse);
@@ -34,7 +34,7 @@ namespace GraphMarkdown
 
             CreateTocMarkdown(permissionMap, rootFolderPath, permFolderPath);
 
-            return true;
+            return permissionMap;
         }
 
         private void CreateTocMarkdown(Dictionary<string, GraphPermissionMap> perms, string rootFolderPath, string permFolderPath)

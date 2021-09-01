@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace GraphMarkdown.Data
 {
-    class GraphPermissionMap
+    public class GraphPermissionMap
     {
         public GraphPermissionMap(string permissionName)
         {

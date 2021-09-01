@@ -12,8 +12,7 @@ namespace GraphPermissionParser
         static async Task Main(string[] args)
         {
             var parser = new GraphDocParser();
-            var apiFolder = @"F:\code\microsoft-graph-docs\api-reference\v1.0\api\";
-            apiFolder = args[0];
+            var apiFolder = args[0];
             var permissions = parser.GetPermissionsInFolder(apiFolder);
 
             //var filePath = @"F:\code\microsoft-graph-docs\api-reference\v1.0\api\intune-rbac-deviceandappmanagementroledefinition-delete.md";
@@ -21,11 +20,12 @@ namespace GraphPermissionParser
 
             var config = GetConfig();
             var mdg = new MarkdownGenerator(config);
-            var mdFolder = @"F:\Code\temp\graphpermdoc\docfx_project";
-            mdFolder = args[1];
-            var result = await mdg.GenerateAsync(permissions, mdFolder);
-            //var csvFilePath = @"F:\code\temp\graphperm.csv";
-            //Csv.SavePermissionsToCsv(permissions, csvFilePath);
+            var mdFolder = args[1];
+            var permissionMap = await mdg.GenerateAsync(permissions, mdFolder);
+#if DEBUG
+            var csvFilePath = @"F:\Code\GraphPermission\docfx_project\graphperm.csv";
+            Csv.SavePermissionsToCsv(permissionMap, csvFilePath);
+#endif
 
         }
 
