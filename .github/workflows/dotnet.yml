@@ -69,7 +69,7 @@ jobs:
       env:
         API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
       with:
-        source_file: '/_site/.'
+        source_file: '_site/.'
         destination_repo: 'merill/graphpermissions.github.io'
         user_email: 'merill@merill.net'
         user_name: 'merill'
