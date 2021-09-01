@@ -16,6 +16,8 @@ namespace GraphMarkdown
         public List<DocGraphPermission> GetPermissionsInFile(string filePath)
         {
             var md = File.ReadAllText(filePath);
+
+            //TODO: If file is subscription-get need to parse table differently (deleage and app perms are in columns). 
             var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
 
             var doc = Markdown.Parse(md, pipeline);
@@ -37,17 +39,34 @@ namespace GraphMarkdown
                     {
                         var cells = row.Descendants<TableCell>().ToList();
                         var permissionType = cells[0].Descendants<LiteralInline>().FirstOrDefault().Content.ToString();
-                        var permission = cells[1].Descendants<LiteralInline>().FirstOrDefault().Content.ToString();
+
+                        var permission = string.Empty;
+                        foreach (var cell in cells[1].Descendants<LiteralInline>())
+                        {
+                            permission += cell.Content.ToString();
+                        }
                         permission = permission
                                         .Replace(" and ", ",")
                                         .Replace(" or ", ",")
-                                        .Replace(" plus ", ",");
+                                        .Replace(" plus ", ",")
+                                        .Replace("either ", ",")
+                                        .Replace("For user resource:", ",")
+                                        .Replace("For group resource:", ",")
+                                        .Replace("For contact resource:", ",")
+                                        .Replace("Role required to create subscription,Subscription.Read.All (see below).", "Subscription.Read.All")
+                                        .Replace("Role required to create subscription.", "")
+                                        .Replace("for a chat message.", ",")
+                                        .Replace("for a channel message.", ",")
+                                        .Replace("One from ", ",")
+                                        .Replace("plus either", ",")
+                                        ;
                         foreach (var perm in permission.Split(','))
                         {
                             if (!string.IsNullOrWhiteSpace(perm))
                             {
                                 if (IsValidPermission(perm))
                                 {
+                                    var permissionName = perm.Replace("*", "#").Trim(); //* is an invalid file name
                                     foreach (var httpRequest in httpRequests)
                                     {
                                         if (!string.IsNullOrWhiteSpace(httpRequest))
@@ -55,7 +74,7 @@ namespace GraphMarkdown
                                             permissions.Add(new DocGraphPermission()
                                             {
                                                 PermissionType = permissionType,
-                                                PermissionName = perm.Trim(),
+                                                PermissionName = permissionName,
                                                 HttpRequest = httpRequest,
                                                 SourceFile = Path.GetFileNameWithoutExtension(filePath)
                                             });

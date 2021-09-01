@@ -153,7 +153,6 @@ namespace GraphMarkdown
                 sb.AppendLine($"* [{docPerm.HttpRequest}](https://docs.microsoft.com/en-us/graph/api/{docPerm.SourceFile}?view=graph-rest-1.0&tabs=http)");
                 sb.AppendLine();
             }
-
             CreateFile(folderPath, $"{perm.PermissionName}.md", sb.ToString());
         }
 

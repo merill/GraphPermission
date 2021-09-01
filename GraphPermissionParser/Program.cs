@@ -15,7 +15,7 @@ namespace GraphPermissionParser
             var apiFolder = args[0];
             var permissions = parser.GetPermissionsInFolder(apiFolder);
 
-            //var filePath = @"F:\code\microsoft-graph-docs\api-reference\v1.0\api\intune-rbac-deviceandappmanagementroledefinition-delete.md";
+            //var filePath = @"F:\code\microsoft-graph-docs\api-reference\v1.0\api\subscription-list.md";
             //var permissions = parser.GetPermissionsInFile(filePath);
 
             var config = GetConfig();
