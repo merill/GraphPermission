@@ -55,10 +55,16 @@ namespace GraphMarkdown
                                         .Replace("For contact resource:", ",")
                                         .Replace("Role required to create subscription,Subscription.Read.All (see below).", "Subscription.Read.All")
                                         .Replace("Role required to create subscription.", "")
+                                        .Replace("Permission required to create subscription.", "")
                                         .Replace("for a chat message.", ",")
                                         .Replace("for a channel message.", ",")
                                         .Replace("One from ", ",")
                                         .Replace("plus either", ",")
+                                        .Replace("For user:",",")
+                                        .Replace("For device:", ",")
+                                        .Replace("(see below).", ",")
+                                        .Replace("Profile photo of the signed-in user:", ",")
+                                        .Replace(Environment.NewLine, ",")
                                         ;
                         foreach (var perm in permission.Split(','))
                         {
@@ -122,6 +128,7 @@ namespace GraphMarkdown
             {
                 if (perm.Contains(ignore, StringComparison.InvariantCultureIgnoreCase)) { return false; }
             }
+            if (perm.StartsWith("#") || perm.StartsWith("*")) { return false; }
             return true;
         }
     }

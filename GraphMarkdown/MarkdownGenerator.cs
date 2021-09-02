@@ -98,62 +98,88 @@ namespace GraphMarkdown
 
             sb.AppendLine($"# {perm.PermissionName}"); sb.AppendLine();
 
-            sb.AppendLine($"## Application Permission"); sb.AppendLine();
-            if (perm.ApplicationPermission == null)
+            if (perm.ApplicationPermission == null &&
+                perm.DelegatePermission == null &&
+                (perm.Uris == null || perm.Uris.Count == 0))
             {
-                sb.AppendLine("N/A"); sb.AppendLine();
+                sb.AppendLine("> [!NOTE]"); sb.AppendLine();
+                sb.AppendLine($"> The permission {perm.PermissionName} does not have any graph methods published."); sb.AppendLine();
             }
             else
             {
-                sb.AppendLine($"{perm.ApplicationPermission.id}"); sb.AppendLine();
-                sb.AppendLine($"{perm.ApplicationPermission.displayName}"); sb.AppendLine();
-                sb.AppendLine($"{perm.ApplicationPermission.description}"); sb.AppendLine();
+                var description = perm.DelegatePermission != null ?
+                                    perm.DelegatePermission.adminConsentDescription :
+                                    perm.ApplicationPermission != null ? 
+                                        perm.ApplicationPermission.description : string.Empty;
+                if (!string.IsNullOrEmpty(description))
+                {
+                    sb.AppendLine($"> {description}"); sb.AppendLine();
+                }
+
+
+                if (perm.ApplicationPermission != null || perm.DelegatePermission != null)
+                {
+
+                    AppendGraphMethods(perm, sb);
+
+                    sb.AppendLine("## Permission Type"); sb.AppendLine();
+
+                    if (perm.DelegatePermission != null)
+                    {
+                        sb.AppendLine($"### Delegate Permission");
+                        sb.AppendLine($"|||");
+                        sb.AppendLine($"|-|-|");
+                        sb.AppendLine($"|**Id**|{perm.DelegatePermission.id}|");
+                        sb.AppendLine($"|**Consent Type**|{perm.DelegatePermission.type}|");
+                        sb.AppendLine($"|**Display String**|{perm.DelegatePermission.adminConsentDisplayName}|");
+                        sb.AppendLine($"|**Description**|{perm.DelegatePermission.adminConsentDescription}|");
+                    }
+
+                    if (perm.ApplicationPermission != null)
+                    {
+                        sb.AppendLine($"### Application Permission");
+                        sb.AppendLine($"|||");
+                        sb.AppendLine($"|-|-|");
+                        sb.AppendLine($"|**Id**|{perm.ApplicationPermission.id}|");
+                        sb.AppendLine($"|**Display String**|{perm.ApplicationPermission.displayName}|");
+                        sb.AppendLine($"|**Description**|{perm.ApplicationPermission.description}|");
+                    }
+                }
+
             }
-
-            sb.AppendLine($"## Delegate Permission"); sb.AppendLine();
-
-            if (perm.DelegatePermission == null)
-            {
-                sb.AppendLine("N/A"); sb.AppendLine();
-            }
-            else
-            {
-                sb.AppendLine($"{perm.DelegatePermission.id}"); sb.AppendLine();
-                sb.AppendLine($"Consent Type: {perm.DelegatePermission.type}"); sb.AppendLine();
-                sb.AppendLine("Admin Description"); sb.AppendLine();
-                sb.AppendLine($"{perm.DelegatePermission.adminConsentDisplayName}"); sb.AppendLine();
-                sb.AppendLine($"{perm.DelegatePermission.adminConsentDescription}"); sb.AppendLine();
-
-                sb.AppendLine("User Description"); sb.AppendLine();
-                sb.AppendLine($"{perm.DelegatePermission.userConsentDisplayName}"); sb.AppendLine();
-                sb.AppendLine($"{perm.DelegatePermission.userConsentDescription}"); sb.AppendLine();
-            }
-
-            sb.AppendLine($"## Graph Methods"); sb.AppendLine();
-            sb.AppendLine($"### V1"); sb.AppendLine();
-            var v1Uris = from p in perm.Uris where p.Value.IsV1 && !p.Value.IsBeta select p;
-            AppendUri(sb, v1Uris, false);
-            sb.AppendLine($"### Beta"); sb.AppendLine();
-            var betaUris = from p in perm.Uris where p.Value.IsBeta && !p.Value.IsV1 select p;
-            AppendUri(sb, betaUris, true);
-            sb.AppendLine($"### V1 + Beta"); sb.AppendLine();
-            var v1BetaUris = from p in perm.Uris where p.Value.IsBeta && p.Value.IsV1 select p;
-            AppendUri(sb, v1BetaUris, false);
-
 
             CreateFile(folderPath, $"{perm.PermissionName}.md", sb.ToString());
         }
 
-        private void AppendUri(StringBuilder sb, IEnumerable<KeyValuePair<string, ApiUri>> uris, bool isBeta)
+        private static void AppendGraphMethods(GraphPermissionMap perm, StringBuilder sb)
         {
-            var apiVersion = isBeta ? "graph-rest-beta" : "graph-rest-1.0";
-            
-            foreach (var uri in uris)
+            sb.AppendLine($"## Graph Methods"); sb.AppendLine();
+            if(perm.Uris == null || perm.Uris.Count == 0)
             {
-                var docName = isBeta ? uri.Value.SourceDocBeta : uri.Value.SourceDocV1;
-                var docUri = $"https://docs.microsoft.com/en-us/graph/api/{docName}?view={apiVersion}&tabs=http";
-                sb.AppendLine($"* [{uri.Value.Uri}]({docUri})");
-                sb.AppendLine();
+                sb.AppendLine("> [!NOTE]");
+                sb.AppendLine("> This permission does not have any graph methods published."); sb.AppendLine();
+
+            }
+            else
+            {
+                sb.AppendLine("|Version|Method|");
+                sb.AppendLine("|-------|------|");
+                foreach (var permission in perm.Uris.OrderBy(i => i.Value.Uri))
+                {
+                    var p = permission.Value;
+                    var version = "V1";
+                    var apiVersion = "graph-rest-1.0";
+                    var docName = p.SourceDocV1;
+                    if (!p.IsV1)
+                    {
+                        version = "Beta";
+                        apiVersion = "graph-rest-beta";
+                        docName = p.SourceDocBeta;
+                    }
+
+                    var docUri = $"https://docs.microsoft.com/graph/api/{docName}?view={apiVersion}&tabs=http";
+                    sb.AppendLine($"|{version}|[{p.Uri}]({docUri})|");
+                }
             }
         }
 
