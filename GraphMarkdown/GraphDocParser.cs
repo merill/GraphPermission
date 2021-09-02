@@ -13,7 +13,7 @@ namespace GraphMarkdown
     public class GraphDocParser
     {
 
-        public List<DocGraphPermission> GetPermissionsInFile(string filePath)
+        public List<DocGraphPermission> GetPermissionsInFile(string filePath, bool isBeta)
         {
             var md = File.ReadAllText(filePath);
 
@@ -76,7 +76,8 @@ namespace GraphMarkdown
                                                 PermissionType = permissionType,
                                                 PermissionName = permissionName,
                                                 HttpRequest = httpRequest,
-                                                SourceFile = Path.GetFileNameWithoutExtension(filePath)
+                                                SourceFile = Path.GetFileNameWithoutExtension(filePath),
+                                                IsBeta = isBeta
                                             });
                                         }
                                     }
@@ -94,15 +95,23 @@ namespace GraphMarkdown
             return permissions;
         }
 
-        public List<DocGraphPermission> GetPermissionsInFolder(string folder)
+        public List<DocGraphPermission> GetPermissionsInFolder(string apiReferenceFolder)
         {
             List<DocGraphPermission> permissions = new();
 
-            foreach (var filePath in Directory.GetFiles(folder))
+            //v1
+            var v1FolderPath = Path.Combine(apiReferenceFolder, @"v1.0\api");
+            foreach (var filePath in Directory.GetFiles(v1FolderPath))
             {
-                permissions.AddRange(GetPermissionsInFile(filePath));
+                permissions.AddRange(GetPermissionsInFile(filePath, false));
             }
 
+            //beta
+            var betaFolderPath = Path.Combine(apiReferenceFolder, @"beta\api");
+            foreach (var filePath in Directory.GetFiles(betaFolderPath))
+            {
+                permissions.AddRange(GetPermissionsInFile(filePath, true));
+            }
             return permissions;
         }
 

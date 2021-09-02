@@ -6,5 +6,6 @@
         public string PermissionType { get; set; }
         public string PermissionName { get; set; }
         public string HttpRequest { get; set; }
+        public bool IsBeta { get; set; }
     }
 }

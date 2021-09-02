@@ -27,6 +27,8 @@ namespace GraphMarkdown.Data
                 docGraphPermissions = value;
             }
         }
+        public Dictionary<string, ApiUri> Uris { get; set; }
+
         public Oauth2permissionscopes DelegatePermission { get; set; }
         public Approle ApplicationPermission { get; set; }
     }

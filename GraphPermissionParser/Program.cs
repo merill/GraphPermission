@@ -15,8 +15,8 @@ namespace GraphPermissionParser
             var apiFolder = args[0];
             var permissions = parser.GetPermissionsInFolder(apiFolder);
 
-            //var filePath = @"F:\code\microsoft-graph-docs\api-reference\v1.0\api\subscription-list.md";
-            //var permissions = parser.GetPermissionsInFile(filePath);
+            //var filePath = @"F:\code\microsoft-graph-docs\api-reference\v1.0\api\workforceintegration-post.md";
+            //var permissions = parser.GetPermissionsInFile(filePath, false);
 
             var config = GetConfig();
             var mdg = new MarkdownGenerator(config);
