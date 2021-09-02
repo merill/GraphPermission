@@ -1,0 +1,14 @@
+{{!Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. See LICENSE file in the project root for full license information.}}
+
+<footer>
+  <div class="grad-bottom"></div>
+  <div class="footer">
+    <div class="container">
+      <span class="pull-right">
+        <a href="#top">{{__global.backToTop}}</a>
+      </span>
+      {{{_appFooter}}}
+      {{^_appFooter}}<span>Created by <strong><a href="https://twitter.com/merill">merill</a></strong></span> | <span><a href="https://github.com/merill/graphpermissions.github.io/issues">Submit feedback</a></span>{{/_appFooter}}
+    </div>
+  </div>
+</footer>
