@@ -23,7 +23,7 @@
     "fileMetadataFiles": [],
     "template": [
       "default",
-      "templates/minimal"
+      "templates/material"
     ],
     "postProcessors": ["ExtractSearchIndex"],
     "markdownEngineName": "markdig",
