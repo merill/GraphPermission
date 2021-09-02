@@ -41,7 +41,7 @@ jobs:
       run: tree
       shell: pwsh
     - name: Create Graph Permission Docs
-      run: .\outbin\GraphPermissionParser "$(Get-Location)/microsoft-graph-docs/api-reference/v1.0/api" "$(Get-Location)\docfx_project"
+      run: .\outbin\GraphPermissionParser "$(Get-Location)/microsoft-graph-docs/api-reference" "$(Get-Location)\docfx_project"
       shell: pwsh
     - name: DocFX Build
       run: docfx .\docfx_project\docfx.json
