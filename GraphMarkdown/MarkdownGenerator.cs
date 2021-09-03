@@ -50,10 +50,12 @@ namespace GraphMarkdown
             sbYml.AppendLine($"- name: Overview");
             sbYml.AppendLine($"  href: index.md");
             var lastPermission = "";
-
-            foreach (var perm in perms.OrderBy(i => i.Value.PermissionName))
+            sbIndex.AppendLine("|Permission|Description|");
+            sbIndex.AppendLine("|-|-|");
+            foreach (var item in perms.OrderBy(i => i.Value.PermissionName))
             {
-                var permName = perm.Value.PermissionName;
+                var perm = item.Value;
+                var permName = perm.PermissionName;
                 var url = UrlEncoder.Default.Encode(permName);
 
                 var permShortName = permName.Split(".")[0];
@@ -67,23 +69,17 @@ namespace GraphMarkdown
                 sbYml.AppendLine($"  - name: '{permName}'");
                 sbYml.AppendLine($"    href: '{url}.md'");
 
-                sbIndex.AppendLine($"* [{perm.Value.PermissionName}]({url}.md)");
+                sbIndex.Append($"|[{perm.PermissionName}]({url}.md)");
+                sbIndex.Append($"|{perm.DisplayName}");
+                sbIndex.AppendLine();
+
+                //sbIndex.AppendLine($"* [{perm.PermissionName}]({url}.md)");
             }
 
             CreateFile(permFolderPath, "toc.yml", sbYml.ToString());
             CreateFile(permFolderPath, "index.md", sbIndex.ToString());
             CreateFile(rootFolderPath, "index.md", sbIndex.ToString().Replace("(", "(graphpermission/"));
 
-            var rootToc = @"
-- name: Graph Permissions
-  href: graphpermission/
-  homepage: graphpermission/index.md
-- name: About
-  href: about/
-  homepage: about/index.md
-";
-
-            CreateFile(rootFolderPath, "toc.yml", rootToc);
         }
 
         private void CreateFile(string folderPath, string fileName, string content)
@@ -107,26 +103,19 @@ namespace GraphMarkdown
             }
             else
             {
-                var description = perm.DelegatePermission != null ?
-                                    perm.DelegatePermission.adminConsentDescription :
-                                    perm.ApplicationPermission != null ? 
-                                        perm.ApplicationPermission.description : string.Empty;
-                if (!string.IsNullOrEmpty(description))
+                if (!string.IsNullOrEmpty(perm.Description))
                 {
-                    sb.AppendLine($"> {description}"); sb.AppendLine();
+                    sb.AppendLine($"> {perm.Description}");
                 }
-
 
                 if (perm.ApplicationPermission != null || perm.DelegatePermission != null)
                 {
 
                     AppendGraphMethods(perm, sb);
 
-                    sb.AppendLine("## Permission Type"); sb.AppendLine();
-
                     if (perm.DelegatePermission != null)
                     {
-                        sb.AppendLine($"### Delegate Permission");
+                        sb.AppendLine($"## Delegate Permission");
                         sb.AppendLine($"|||");
                         sb.AppendLine($"|-|-|");
                         sb.AppendLine($"|**Id**|{perm.DelegatePermission.id}|");
@@ -137,7 +126,7 @@ namespace GraphMarkdown
 
                     if (perm.ApplicationPermission != null)
                     {
-                        sb.AppendLine($"### Application Permission");
+                        sb.AppendLine($"## Application Permission");
                         sb.AppendLine($"|||");
                         sb.AppendLine($"|-|-|");
                         sb.AppendLine($"|**Id**|{perm.ApplicationPermission.id}|");
