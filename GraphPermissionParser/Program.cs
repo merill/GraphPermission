@@ -15,13 +15,16 @@ namespace GraphPermissionParser
             var apiFolder = args[0];
             var permissions = parser.GetPermissionsInFolder(apiFolder);
 
-            //var filePath = @"F:\code\microsoft-graph-docs\api-reference\v1.0\api\workforceintegration-post.md";
+            //var filePath = @"F:\code\microsoft-graph-docs\api-reference\beta\api\languageproficiency-get.md";
             //var permissions = parser.GetPermissionsInFile(filePath, false);
+
+            var resources = parser.GetResourcesInFolder(apiFolder);
+
 
             var config = GetConfig();
             var mdg = new MarkdownGenerator(config);
             var mdFolder = args[1];
-            var permissionMap = await mdg.GenerateAsync(permissions, mdFolder);
+            var permissionMap = await mdg.GenerateAsync(permissions, resources, mdFolder);
 #if DEBUG
             var csvFilePath = @"F:\Code\GraphPermission\docfx_project\graphperm.csv";
             Csv.SavePermissionsToCsv(permissionMap, csvFilePath);

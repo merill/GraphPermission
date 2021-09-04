@@ -7,5 +7,7 @@
         public bool IsV1 { get; set; }
         public string SourceDocBeta { get; set; }
         public string SourceDocV1 { get; set; }
+        public bool IsApplication { get; set; }
+        public bool IsDelegate { get; set; }
     }
 }

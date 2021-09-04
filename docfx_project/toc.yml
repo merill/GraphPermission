@@ -1,7 +1,7 @@
 - name: Home
   homepage: index.md
 - name: Graph Permissions
-  href: graphpermission/
-  homepage: graphpermission/index.md
+  href: permission/
+  homepage: permission/index.md
 - name: About
   homepage: about/index.md

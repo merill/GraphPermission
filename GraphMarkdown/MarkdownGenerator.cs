@@ -15,21 +15,24 @@ namespace GraphMarkdown
     {
         Config _config;
 
+        private const string PermissionFolderName = "permission";
+
         public MarkdownGenerator(Config config)
         {
             _config = config;
         }
 
-        public async Task<Dictionary<string, GraphPermissionMap>> GenerateAsync(List<DocGraphPermission> docPermissions, string rootFolderPath)
+        public async Task<Dictionary<string, GraphPermissionMap>> GenerateAsync(
+            List<DocGraphPermission> docPermissions, Dictionary<string, DocResource> docResources, string rootFolderPath)
         {
             var graphResponse = await GetGraphResponseObject();
             var permissionMap = MapPermissions(docPermissions, graphResponse);
 
-            var permFolderPath = Path.Combine(rootFolderPath, "graphpermission");
+            var permFolderPath = Path.Combine(rootFolderPath, PermissionFolderName);
 
             foreach (var perm in permissionMap)
             {
-                CreateMarkdown(perm.Value, permFolderPath);
+                CreateMarkdown(perm.Value, docResources, permFolderPath);
             }
 
             CreateTocMarkdown(permissionMap, rootFolderPath, permFolderPath);
@@ -78,7 +81,7 @@ namespace GraphMarkdown
 
             CreateFile(permFolderPath, "toc.yml", sbYml.ToString());
             CreateFile(permFolderPath, "index.md", sbIndex.ToString());
-            CreateFile(rootFolderPath, "index.md", sbIndex.ToString().Replace("(", "(graphpermission/"));
+            CreateFile(rootFolderPath, "index.md", sbIndex.ToString().Replace("(", $"({PermissionFolderName}/"));
 
         }
 
@@ -88,7 +91,7 @@ namespace GraphMarkdown
             var filePath = Path.Combine(folderPath, fileName);
             File.WriteAllText(filePath, content);
         }
-        private void CreateMarkdown(GraphPermissionMap perm, string folderPath)
+        private void CreateMarkdown(GraphPermissionMap perm, Dictionary<string, DocResource> docResources, string folderPath)
         {
             var sb = new StringBuilder();
 
@@ -108,74 +111,124 @@ namespace GraphMarkdown
                     sb.AppendLine($"> {perm.Description}");
                 }
 
-                if (perm.ApplicationPermission != null || perm.DelegatePermission != null)
-                {
+                AppendGraphMethods(perm, sb);
 
-                    AppendGraphMethods(perm, sb);
+                AppendPermissionTypeInfo(perm, sb);
 
-                    if (perm.DelegatePermission != null)
-                    {
-                        sb.AppendLine($"## Delegate Permission");
-                        sb.AppendLine($"|||");
-                        sb.AppendLine($"|-|-|");
-                        sb.AppendLine($"|**Id**|{perm.DelegatePermission.id}|");
-                        sb.AppendLine($"|**Consent Type**|{perm.DelegatePermission.type}|");
-                        sb.AppendLine($"|**Display String**|{perm.DelegatePermission.adminConsentDisplayName}|");
-                        sb.AppendLine($"|**Description**|{perm.DelegatePermission.adminConsentDescription}|");
-                    }
-
-                    if (perm.ApplicationPermission != null)
-                    {
-                        sb.AppendLine($"## Application Permission");
-                        sb.AppendLine($"|||");
-                        sb.AppendLine($"|-|-|");
-                        sb.AppendLine($"|**Id**|{perm.ApplicationPermission.id}|");
-                        sb.AppendLine($"|**Display String**|{perm.ApplicationPermission.displayName}|");
-                        sb.AppendLine($"|**Description**|{perm.ApplicationPermission.description}|");
-                    }
-                }
-
+                AppendResources(perm, docResources, sb);
             }
 
             CreateFile(folderPath, $"{perm.PermissionName}.md", sb.ToString());
         }
 
-        private static void AppendGraphMethods(GraphPermissionMap perm, StringBuilder sb)
+        private void AppendResources(GraphPermissionMap perm, Dictionary<string, DocResource> docResources, StringBuilder sb)
         {
-            sb.AppendLine($"## Graph Methods"); sb.AppendLine();
-            if(perm.Uris == null || perm.Uris.Count == 0)
-            {
-                sb.AppendLine("> [!NOTE]");
-                sb.AppendLine("> This permission does not have any graph methods published."); sb.AppendLine();
+            var permResourceNames = (from p in perm.DocPermissions where p.Resources != null select p.Resources);
+            var uniquePermResources = new Dictionary<string, DocResource>();
 
-            }
-            else
+
+            foreach (var permResourceName in permResourceNames)
             {
-                sb.AppendLine("|Version|Method|");
-                sb.AppendLine("|-------|------|");
-                foreach (var permission in perm.Uris.OrderBy(i => i.Value.Uri))
+                foreach (var resourceName in permResourceName)
                 {
-                    var p = permission.Value;
-                    var version = "V1";
-                    var apiVersion = "graph-rest-1.0";
-                    var docName = p.SourceDocV1;
-                    if (!p.IsV1)
+                    if (!uniquePermResources.ContainsKey(resourceName))
                     {
-                        version = "Beta";
-                        apiVersion = "graph-rest-beta";
-                        docName = p.SourceDocBeta;
+                        if (docResources.ContainsKey(resourceName))
+                        {
+                            uniquePermResources.Add(resourceName, docResources[resourceName]);
+                        }
                     }
-
-                    var docUri = $"https://docs.microsoft.com/graph/api/{docName}?view={apiVersion}&tabs=http";
-                    sb.AppendLine($"|{version}|[{p.Uri}]({docUri})|");
+                }
+            }
+            if(uniquePermResources.Count > 0)
+            {
+                sb.AppendLine($"## Resources");
+                foreach (var resource in uniquePermResources.OrderBy(i => i.Key))
+                {
+                    var res = resource.Value;
+                    var name = string.IsNullOrEmpty(res.ResourceName) ? res.SourceFile : res.ResourceName;
+                    var docUri = GetMicrosoftGraphDocLink(name.Replace("resource type", ""), res.SourceFile, res.SourceFile, true, !res.IsBeta);
+                    sb.AppendLine($"### {docUri}");
+                    sb.AppendLine(res.PropertiesMarkdown);
                 }
             }
         }
 
+        private static void AppendPermissionTypeInfo(GraphPermissionMap perm, StringBuilder sb)
+        {
+            if (perm.DelegatePermission != null)
+            {
+                sb.AppendLine($"## Delegate Permission");
+                sb.AppendLine($"|||");
+                sb.AppendLine($"|-|-|");
+                sb.AppendLine($"|**Id**|{perm.DelegatePermission.id}|");
+                sb.AppendLine($"|**Consent Type**|{perm.DelegatePermission.type}|");
+                sb.AppendLine($"|**Display String**|{perm.DelegatePermission.adminConsentDisplayName}|");
+                sb.AppendLine($"|**Description**|{perm.DelegatePermission.adminConsentDescription}|");
+            }
+
+            if (perm.ApplicationPermission != null)
+            {
+                sb.AppendLine($"## Application Permission");
+                sb.AppendLine($"|||");
+                sb.AppendLine($"|-|-|");
+                sb.AppendLine($"|**Id**|{perm.ApplicationPermission.id}|");
+                sb.AppendLine($"|**Display String**|{perm.ApplicationPermission.displayName}|");
+                sb.AppendLine($"|**Description**|{perm.ApplicationPermission.description}|");
+            }
+        }
+
+        private static void AppendGraphMethods(GraphPermissionMap perm, StringBuilder sb)
+        {
+            sb.AppendLine($"## Graph Methods"); sb.AppendLine();
+            if (perm.Uris == null || perm.Uris.Count == 0)
+            {
+                sb.AppendLine("> [!NOTE]");
+                sb.AppendLine("> This permission does not have any graph methods published."); sb.AppendLine();
+            }
+            else
+            {
+                sb.AppendLine("Type: A = Application Permission, D = Delegate Permission"); sb.AppendLine();
+
+                sb.AppendLine("|Ver|Type|Method|");
+                sb.AppendLine("|-------|----|------|");
+                foreach (var permission in perm.Uris.OrderBy(i => i.Value.Uri))
+                {
+                    var p = permission.Value;
+                    var version = "V1";
+                    if (!p.IsV1)
+                    {
+                        version = "Beta";
+                    }
+                    var permType = p.IsApplication && p.IsDelegate ? "A,D" :
+                                    p.IsApplication ? "A" :
+                                    p.IsDelegate ? "D" : "";
+
+                    var docUri = GetMicrosoftGraphDocLink(p.Uri, p.SourceDocV1, p.SourceDocBeta, false, p.IsV1);
+                    sb.AppendLine($"|{version}|{permType}|{docUri}|");
+                    
+                }
+            }
+        }
+
+        private static string GetMicrosoftGraphDocLink(string title, string docNameV1, string docNameBeta, bool isResource, bool isV1)
+        {
+            var apiVersion = "graph-rest-1.0";
+            var docName = docNameV1;
+            if (!isV1)
+            {
+                apiVersion = "graph-rest-beta";
+                docName = docNameBeta;
+            }
+            var resoucePath = isResource ? "resources/" : "";
+            var docUri = $"https://docs.microsoft.com/graph/api/{resoucePath}{docName}?view={apiVersion}&tabs=http";
+            return $"[{title}]({docUri})";
+        }
+
         private static Dictionary<string, GraphPermissionMap> MapPermissions(List<DocGraphPermission> docPermissions, MicrosoftGraphObject graphResponse)
         {
-             var permissionMap = new Dictionary<string, GraphPermissionMap>();
-            
+            var permissionMap = new Dictionary<string, GraphPermissionMap>();
+
 
             foreach (var appPerm in graphResponse.appRoles)
             {
@@ -232,11 +285,11 @@ namespace GraphMarkdown
 
         private static void AddApiUri(Dictionary<string, GraphPermissionMap> permissionMap)
         {
-            foreach(var permItem in permissionMap)
+            foreach (var permItem in permissionMap)
             {
                 var perm = permItem.Value;
                 perm.Uris = new Dictionary<string, ApiUri>();
-                foreach(var docPerm in perm.DocPermissions)
+                foreach (var docPerm in perm.DocPermissions)
                 {
                     ApiUri apiUri;
                     if (!perm.Uris.TryGetValue(docPerm.HttpRequest, out apiUri))
@@ -244,6 +297,8 @@ namespace GraphMarkdown
                         apiUri = new ApiUri() { Uri = docPerm.HttpRequest };
                         perm.Uris.Add(docPerm.HttpRequest, apiUri);
                     }
+                    if (docPerm.IsApplicationPermission) { apiUri.IsApplication = true; }
+                    if (docPerm.IsDelegatePermission) { apiUri.IsDelegate = true; }
                     if (docPerm.IsBeta)
                     {
                         apiUri.IsBeta = true;
@@ -264,12 +319,12 @@ namespace GraphMarkdown
         /// <param name="permMap"></param>
         private static void UpdateMissingGraphPermFromDoc(GraphPermissionMap permMap)
         {
-            if(permMap.ApplicationPermission == null)
+            if (permMap.ApplicationPermission == null)
             {
-                var isAppPermission = (from p in permMap.DocPermissions 
-                                       where p.PermissionType.Contains("application", StringComparison.InvariantCultureIgnoreCase) 
+                var isAppPermission = (from p in permMap.DocPermissions
+                                       where p.IsApplicationPermission
                                        select p).FirstOrDefault() != null;
-                if(isAppPermission)
+                if (isAppPermission)
                 {
                     permMap.ApplicationPermission = new Approle() { value = permMap.PermissionName };
                 }
@@ -278,8 +333,8 @@ namespace GraphMarkdown
             if (permMap.DelegatePermission == null)
             {
                 var isDelegatePermission = (from p in permMap.DocPermissions
-                                       where p.PermissionType.Contains("delegate", StringComparison.InvariantCultureIgnoreCase)
-                                       select p).FirstOrDefault() != null;
+                                            where p.IsDelegatePermission
+                                            select p).FirstOrDefault() != null;
                 if (isDelegatePermission)
                 {
                     permMap.DelegatePermission = new Oauth2permissionscopes() { value = permMap.PermissionName };

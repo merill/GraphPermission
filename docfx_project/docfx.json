@@ -3,8 +3,8 @@
     "content": [
       {
         "files": [
-          "graphpermission/**.md",
-          "graphpermission/**/toc.yml",
+          "permission/**.md",
+          "permission/**/toc.yml",
           "about/**.md",
           "toc.yml",
           "*.md"
