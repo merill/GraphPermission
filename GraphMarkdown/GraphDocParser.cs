@@ -144,7 +144,7 @@ namespace GraphMarkdown
             {
                 var fileName = Path.GetFileNameWithoutExtension(filePath);
                 var uri = GraphHelper.GetMicrosoftGraphDocLink(fileName, fileName, fileName, false, !isBeta);
-                _logger.Warning("No permissions found in {0}", uri);
+                _logger.Warning($"No permissions found in {uri}");
             }
 
             return permissions;

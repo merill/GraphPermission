@@ -16,23 +16,37 @@ namespace GraphPermissionParser
             var apiFolder = args[0];
             var docfxFolder = args[1];
             var siteFolder = Path.Combine(docfxFolder, "_site");
-            var logger = InitializeLogger(siteFolder);
-            var parser = new GraphDocParser(logger);
+            var logger = InitializeLogger(docfxFolder);
 
-            var permissions = parser.GetPermissionsInFolder(apiFolder);
+            try
+            {
+                var parser = new GraphDocParser(logger);
 
-            //var filePath = @"F:\code\microsoft-graph-docs\api-reference\beta\api\driveitem-get.md";
-            //var permissions = parser.GetPermissionsInFile(filePath, false);
+                var permissions = parser.GetPermissionsInFolder(apiFolder);
 
-            var resources = parser.GetResourcesInFolder(apiFolder);
+                //var filePath = @"F:\code\microsoft-graph-docs\api-reference\beta\api\driveitem-get.md";
+                //var permissions = parser.GetPermissionsInFile(filePath, false);
 
-            var config = GetConfig();
-            var mdg = new MarkdownGenerator(config, logger);
+                var resources = parser.GetResourcesInFolder(apiFolder);
 
-            var permissionMap = await mdg.GenerateAsync(permissions, resources, docfxFolder);
+                var config = GetConfig();
+                var mdg = new MarkdownGenerator(config, logger);
 
-            var csvFilePath = Path.Combine(siteFolder, "GraphPermission.csv");
-            Csv.SavePermissionsToCsv(permissionMap, csvFilePath);
+                var permissionMap = await mdg.GenerateAsync(permissions, resources, docfxFolder);
+
+                var csvFilePath = Path.Combine(siteFolder, "permission.csv");
+                Csv.SavePermissionsToCsv(permissionMap, csvFilePath);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error occured");
+                throw;
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+
         }
 
         private static Config GetConfig()
@@ -51,13 +65,17 @@ namespace GraphPermissionParser
             };
         }
 
-        private static ILogger InitializeLogger(string siteFolder)
+        private static ILogger InitializeLogger(string docfxFolder)
         {
-            var logFile = Path.Combine(siteFolder, "log.txt");
-            using var log = new LoggerConfiguration()
+            var logTemplate = "{Message}{NewLine}{NewLine}";
+
+            var logFile = Path.Combine(docfxFolder, "log.md");
+            var log = new LoggerConfiguration()
+                .MinimumLevel.Verbose()
                 .WriteTo.Console()
-                .WriteTo.File(logFile)
+                .WriteTo.File(logFile, Serilog.Events.LogEventLevel.Verbose, logTemplate, shared: true)
                 .CreateLogger();
+
             return log;
         }
     }

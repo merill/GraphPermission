@@ -255,7 +255,7 @@ namespace GraphMarkdown
                 if (permMap.ApplicationPermission == null && permMap.DelegatePermission == null)
                 {
                     var permissionUri = GraphHelper.GetGraphPermUri(permMap.PermissionName);
-                    _logger.Warning("DocPerm not in Graph: {0}", permissionUri);
+                    _logger.Warning($"DocPerm not in Graph: [{permMap.PermissionName}]({permissionUri})");
                 }
 
                 if (permMap.DocPermissions.Count == 0)
@@ -263,11 +263,11 @@ namespace GraphMarkdown
                     var permissionUri = GraphHelper.GetGraphPermUri(permMap.PermissionName);
                     if (permMap.ApplicationPermission == null)
                     {
-                        _logger.Warning("AppPerm not in Doc: {1}", permMap.PermissionName, permissionUri);
+                        _logger.Warning($"AppPerm not in Doc [{permMap.PermissionName}]({permissionUri})");
                     }
                     if (permMap.DelegatePermission == null)
                     {
-                        _logger.Warning("DelPerm not in Doc: {1}", permMap.PermissionName, permissionUri);
+                        _logger.Warning($"DelPerm not in Doc: [{permMap.PermissionName}]({permissionUri})");
                     }
                 }
             }

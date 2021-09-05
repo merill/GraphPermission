@@ -24,4 +24,8 @@
     </None>
   </ItemGroup>
 
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="del F:\Code\GraphPermission\docfx_project\log.md&#xD;&#xA;rmdir F:\Code\GraphPermission\docfx_project\_site\ /q /s&#xD;&#xA;rmdir F:\Code\GraphPermission\permission\_\ /q /s" />
+  </Target>
+
 </Project>
