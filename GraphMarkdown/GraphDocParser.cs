@@ -16,14 +16,21 @@ namespace GraphMarkdown
 
         public List<DocGraphPermission> GetPermissionsInFile(string filePath, bool isBeta)
         {
-            var md = File.ReadAllText(filePath);
 
             //TODO: If file is subscription-get need to parse table differently (deleage and app perms are in columns). 
+            if (Path.GetFileNameWithoutExtension(filePath).Equals("subscription-list"))
+            {
+                return new List<DocGraphPermission>();
+            }
+
+            var md = File.ReadAllText(filePath);
+
+            
             var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
 
             var doc = Markdown.Parse(md, pipeline);
 
-            List<DocGraphPermission> permissions = ParsePermissions(filePath, isBeta, doc);
+            var permissions = ParsePermissions(filePath, isBeta, doc);
 
             var resources = (from p in doc.Descendants<LinkInline>()
                              where p.Url != null && p.Url.StartsWith("../resources", StringComparison.InvariantCultureIgnoreCase)
@@ -90,33 +97,36 @@ namespace GraphMarkdown
                                         .Replace(" plus ", ",", StringComparison.InvariantCultureIgnoreCase)
                                         .Replace("either ", ",", StringComparison.InvariantCultureIgnoreCase)
                                         ;
-                        List<string> permList = new List<string>();
+                        List<string> permList = new();
                         foreach (var perm in permission.Split(','))
                         {
-                            permList.AddRange(perm.Split(" ")); //Break out all spaces into seperate elements.
+                            if (IsValidPermission(perm))
+                            {
+                                foreach (var permItem in perm.Split(" "))
+                                {
+                                    if (!string.IsNullOrWhiteSpace(permItem))
+                                    {
+                                        permList.Add(permItem); //Break out all spaces into seperate elements.
+                                    }
+                                }
+                            }
                         }
 
-                        foreach (var perm in permission.Split(','))
+                        foreach (var perm in permList)
                         {
-                            if (!string.IsNullOrWhiteSpace(perm))
+                            var permissionName = perm.Replace("*", "").Trim(); //* is used to indicate resource specific permissions.
+                            foreach (var httpRequest in httpRequests)
                             {
-                                if (IsValidPermission(perm))
+                                if (!string.IsNullOrWhiteSpace(httpRequest))
                                 {
-                                    var permissionName = perm.Replace("*", "").Trim(); //* is used to indicate resource specific permissions.
-                                    foreach (var httpRequest in httpRequests)
+                                    permissions.Add(new DocGraphPermission()
                                     {
-                                        if (!string.IsNullOrWhiteSpace(httpRequest))
-                                        {
-                                            permissions.Add(new DocGraphPermission()
-                                            {
-                                                PermissionType = permissionType,
-                                                PermissionName = permissionName,
-                                                HttpRequest = httpRequest,
-                                                SourceFile = Path.GetFileNameWithoutExtension(filePath),
-                                                IsBeta = isBeta
-                                            });
-                                        }
-                                    }
+                                        PermissionType = permissionType,
+                                        PermissionName = permissionName,
+                                        HttpRequest = httpRequest,
+                                        SourceFile = Path.GetFileNameWithoutExtension(filePath),
+                                        IsBeta = isBeta
+                                    });
                                 }
                             }
                         }
