@@ -13,10 +13,10 @@ namespace GraphPermissionParser
         {
             var parser = new GraphDocParser();
             var apiFolder = args[0];
-            var permissions = parser.GetPermissionsInFolder(apiFolder);
+            //var permissions = parser.GetPermissionsInFolder(apiFolder);
 
-            //var filePath = @"F:\code\microsoft-graph-docs\api-reference\beta\api\languageproficiency-get.md";
-            //var permissions = parser.GetPermissionsInFile(filePath, false);
+            var filePath = @"F:\code\microsoft-graph-docs\api-reference\beta\api\driveitem-get.md";
+            var permissions = parser.GetPermissionsInFile(filePath, false);
 
             var resources = parser.GetResourcesInFolder(apiFolder);
 

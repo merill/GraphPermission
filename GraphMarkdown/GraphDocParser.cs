@@ -26,11 +26,11 @@ namespace GraphMarkdown
             List<DocGraphPermission> permissions = ParsePermissions(filePath, isBeta, doc);
 
             var resources = (from p in doc.Descendants<LinkInline>()
-                            where p.Url != null && p.Url.StartsWith("../resources", StringComparison.InvariantCultureIgnoreCase)
-                            select Path.GetFileNameWithoutExtension(p.Url)).Distinct().ToList();
-            if(resources.Count > 0)
+                             where p.Url != null && p.Url.StartsWith("../resources", StringComparison.InvariantCultureIgnoreCase)
+                             select Path.GetFileNameWithoutExtension(p.Url)).Distinct().ToList();
+            if (resources.Count > 0)
             {
-                foreach(var perm in permissions)
+                foreach (var perm in permissions)
                 {
                     perm.Resources = resources;
                 }
@@ -40,7 +40,7 @@ namespace GraphMarkdown
 
         private static List<DocGraphPermission> ParsePermissions(string filePath, bool isBeta, MarkdownDocument doc)
         {
-            var permGraphTable = 
+            var permGraphTable =
                 from p in doc.Descendants<Table>()
                 where p.Descendants<LiteralInline>().FirstOrDefault() != null
                     && p.Descendants<LiteralInline>().FirstOrDefault().Content.ToString().Equals("Permission type", StringComparison.CurrentCultureIgnoreCase)
@@ -65,37 +65,44 @@ namespace GraphMarkdown
                             permission += cell.Content.ToString();
                         }
                         permission = permission
-                                        .Replace(" and ", ",")
-                                        .Replace(" or ", ",")
-                                        .Replace(" plus ", ",")
-                                        .Replace("either ", ",")
-                                        .Replace("For user resource:", ",")
-                                        .Replace("For group resource:", ",")
-                                        .Replace("For contact resource:", ",")
-                                        .Replace("Role required to create subscription,Subscription.Read.All (see below).", "Subscription.Read.All")
-                                        .Replace("Role required to create subscription.", "")
-                                        .Replace("Permission required to create subscription.", "")
-                                        .Replace("for a chat message.", ",")
-                                        .Replace("for a channel message.", ",")
-                                        .Replace("One from ", ",")
-                                        .Replace("plus either", ",")
-                                        .Replace("For user:", ",")
-                                        .Replace("For device:", ",")
-                                        .Replace("(see below).", ",")
-                                        .Replace("Profile photo of the signed-in user:", ",")
-                                        .Replace("In teams:", ",")
-                                        .Replace("In channels:", ",")
-                                        .Replace("chat resource:", ",")
-                                        .Replace("For channel resource:", ",")
+                                        .Replace("Role required to create subscription,Subscription.Read.All (see below).", "Subscription.Read.All", StringComparison.InvariantCultureIgnoreCase)
+                                        .Replace("Role required to create subscription.", "", StringComparison.InvariantCultureIgnoreCase)
+                                        .Replace("Permission required to create subscription.", "", StringComparison.InvariantCultureIgnoreCase)
+                                        .Replace("For user or chat resource:", ",", StringComparison.InvariantCultureIgnoreCase)
+                                        .Replace("For user resource:", ",", StringComparison.InvariantCultureIgnoreCase)
+                                        .Replace("For group resource:", ",", StringComparison.InvariantCultureIgnoreCase)
+                                        .Replace("For contact resource:", ",", StringComparison.InvariantCultureIgnoreCase)
+                                        .Replace("For channel resource:", ",", StringComparison.InvariantCultureIgnoreCase)
+                                        .Replace("For user:", ",", StringComparison.InvariantCultureIgnoreCase)
+                                        .Replace("For device:", ",", StringComparison.InvariantCultureIgnoreCase)
+                                        .Replace("In teams:", ",", StringComparison.InvariantCultureIgnoreCase)
+                                        .Replace("In channels:", ",", StringComparison.InvariantCultureIgnoreCase)
+                                        .Replace("chat resource:", ",", StringComparison.InvariantCultureIgnoreCase)
+                                        .Replace("for a chat message.", ",", StringComparison.InvariantCultureIgnoreCase)
+                                        .Replace("for a channel message.", ",", StringComparison.InvariantCultureIgnoreCase)
+                                        .Replace("One from ", ",", StringComparison.InvariantCultureIgnoreCase)
+                                        .Replace("plus either", ",", StringComparison.InvariantCultureIgnoreCase)
+                                        .Replace("(see below).", ",", StringComparison.InvariantCultureIgnoreCase)
+                                        .Replace("Profile photo of the signed-in user:", ",", StringComparison.InvariantCultureIgnoreCase)
                                         .Replace(Environment.NewLine, ",")
+                                        .Replace(" and ", ",", StringComparison.InvariantCultureIgnoreCase)
+                                        .Replace(" or ", ",", StringComparison.InvariantCultureIgnoreCase)
+                                        .Replace(" plus ", ",", StringComparison.InvariantCultureIgnoreCase)
+                                        .Replace("either ", ",", StringComparison.InvariantCultureIgnoreCase)
                                         ;
+                        List<string> permList = new List<string>();
+                        foreach (var perm in permission.Split(','))
+                        {
+                            permList.AddRange(perm.Split(" ")); //Break out all spaces into seperate elements.
+                        }
+
                         foreach (var perm in permission.Split(','))
                         {
                             if (!string.IsNullOrWhiteSpace(perm))
                             {
                                 if (IsValidPermission(perm))
                                 {
-                                    var permissionName = perm.Replace("*", "#").Trim(); //* is an invalid file name
+                                    var permissionName = perm.Replace("*", "").Trim(); //* is used to indicate resource specific permissions.
                                     foreach (var httpRequest in httpRequests)
                                     {
                                         if (!string.IsNullOrWhiteSpace(httpRequest))
@@ -190,18 +197,18 @@ namespace GraphMarkdown
             var resourceName = (from p in doc.Descendants<HeadingBlock>()
                                 where p.Inline.FirstChild.ToString().EndsWith("resource type", StringComparison.InvariantCultureIgnoreCase)
                                 select p.Inline.FirstChild.ToString()).FirstOrDefault();
-            if(resourceName != null)
+            if (resourceName != null)
             {
                 docResource.ResourceName = resourceName.ToString();
             }
 
-            var propertyTable = 
+            var propertyTable =
                 (from p in doc.Descendants<Table>()
-                where p.Descendants<LiteralInline>().FirstOrDefault() != null && 
-                    p.Descendants<LiteralInline>().FirstOrDefault().Content.ToString().Equals("Property", StringComparison.CurrentCultureIgnoreCase)
+                 where p.Descendants<LiteralInline>().FirstOrDefault() != null &&
+                     p.Descendants<LiteralInline>().FirstOrDefault().Content.ToString().Equals("Property", StringComparison.CurrentCultureIgnoreCase)
                  select p).FirstOrDefault();
 
-            if(propertyTable != null)
+            if (propertyTable != null)
             {
                 docResource.PropertiesMarkdown = md.Substring(propertyTable.Span.Start - 1, propertyTable.Span.Length + 2);
                 //Remove hyperlinks from the properties

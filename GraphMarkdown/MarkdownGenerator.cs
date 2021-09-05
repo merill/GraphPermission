@@ -60,7 +60,6 @@ namespace GraphMarkdown
                 var perm = item.Value;
                 var permName = perm.PermissionName;
                 var url = UrlEncoder.Default.Encode(permName);
-
                 var permShortName = permName.Split(".")[0];
                 if (lastPermission != permShortName)
                 {
