@@ -1,8 +1,10 @@
 ﻿using GraphMarkdown.Data;
+using GraphMarkdown.Infrastructure;
 using Markdig;
 using Markdig.Extensions.Tables;
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,7 +15,11 @@ namespace GraphMarkdown
 {
     public class GraphDocParser
     {
-
+        private static ILogger _logger;
+        public GraphDocParser(ILogger logger)
+        {
+            _logger = logger;
+        }
         public List<DocGraphPermission> GetPermissionsInFile(string filePath, bool isBeta)
         {
 
@@ -136,7 +142,9 @@ namespace GraphMarkdown
 
             if (permissions.Count == 0)
             {
-                Console.WriteLine("Warning: No permissions found on {0}", filePath);
+                var fileName = Path.GetFileNameWithoutExtension(filePath);
+                var uri = GraphHelper.GetMicrosoftGraphDocLink(fileName, fileName, fileName, false, !isBeta);
+                _logger.Warning("No permissions found in {0}", uri);
             }
 
             return permissions;

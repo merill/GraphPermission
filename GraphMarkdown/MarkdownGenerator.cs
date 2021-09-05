@@ -1,5 +1,6 @@
 ﻿using GraphMarkdown.Data;
 using GraphMarkdown.Infrastructure;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,12 +15,14 @@ namespace GraphMarkdown
     public class MarkdownGenerator
     {
         Config _config;
+        static ILogger _logger;
 
         private const string PermissionFolderName = "permission";
 
-        public MarkdownGenerator(Config config)
+        public MarkdownGenerator(Config config, ILogger logger)
         {
             _config = config;
+            _logger = logger;
         }
 
         public async Task<Dictionary<string, GraphPermissionMap>> GenerateAsync(
@@ -146,7 +149,7 @@ namespace GraphMarkdown
                 {
                     var res = resource.Value;
                     var name = string.IsNullOrEmpty(res.ResourceName) ? res.SourceFile : res.ResourceName;
-                    var docUri = GetMicrosoftGraphDocLink(name.Replace("resource type", ""), res.SourceFile, res.SourceFile, true, !res.IsBeta);
+                    var docUri = GraphHelper.GetMicrosoftGraphDocLink(name.Replace("resource type", ""), res.SourceFile, res.SourceFile, true, !res.IsBeta);
                     sb.AppendLine($"### {docUri}");
                     sb.AppendLine(res.PropertiesMarkdown);
                 }
@@ -203,26 +206,14 @@ namespace GraphMarkdown
                                     p.IsApplication ? "A" :
                                     p.IsDelegate ? "D" : "";
 
-                    var docUri = GetMicrosoftGraphDocLink(p.Uri, p.SourceDocV1, p.SourceDocBeta, false, p.IsV1);
+                    var docUri = GraphHelper.GetMicrosoftGraphDocLink(p.Uri, p.SourceDocV1, p.SourceDocBeta, false, p.IsV1);
                     sb.AppendLine($"|{version}|{permType}|{docUri}|");
                     
                 }
             }
         }
 
-        private static string GetMicrosoftGraphDocLink(string title, string docNameV1, string docNameBeta, bool isResource, bool isV1)
-        {
-            var apiVersion = "graph-rest-1.0";
-            var docName = docNameV1;
-            if (!isV1)
-            {
-                apiVersion = "graph-rest-beta";
-                docName = docNameBeta;
-            }
-            var resoucePath = isResource ? "resources/" : "";
-            var docUri = $"https://docs.microsoft.com/graph/api/{resoucePath}{docName}?view={apiVersion}&tabs=http";
-            return $"[{title}]({docUri})";
-        }
+
 
         private static Dictionary<string, GraphPermissionMap> MapPermissions(List<DocGraphPermission> docPermissions, MicrosoftGraphObject graphResponse)
         {
@@ -260,21 +251,23 @@ namespace GraphMarkdown
             {
                 UpdateMissingGraphPermFromDoc(permMap);
                 AddApiUri(permissionMap);
-
+                
                 if (permMap.ApplicationPermission == null && permMap.DelegatePermission == null)
                 {
-                    Console.WriteLine("DocPerm not in Graph: {0}", permMap.DocPermissions[0].PermissionName);
+                    var permissionUri = GraphHelper.GetGraphPermUri(permMap.PermissionName);
+                    _logger.Warning("DocPerm not in Graph: {0}", permissionUri);
                 }
 
                 if (permMap.DocPermissions.Count == 0)
                 {
+                    var permissionUri = GraphHelper.GetGraphPermUri(permMap.PermissionName);
                     if (permMap.ApplicationPermission == null)
                     {
-                        Console.WriteLine("AppPerm not in Doc: {0}", permMap.PermissionName);
+                        _logger.Warning("AppPerm not in Doc: {1}", permMap.PermissionName, permissionUri);
                     }
                     if (permMap.DelegatePermission == null)
                     {
-                        Console.WriteLine("DelPerm not in Doc: {0}", permMap.PermissionName);
+                        _logger.Warning("DelPerm not in Doc: {1}", permMap.PermissionName, permissionUri);
                     }
                 }
             }

@@ -10,43 +10,61 @@ namespace GraphMarkdown.Infrastructure
     {
         public static void SavePermissionsToCsv(Dictionary<string, GraphPermissionMap> permMap, string filePath)
         {
-            //using var writer = new StreamWriter(filePath);
-            //using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
-            //csv.WriteRecord(permissions);
+            new DirectoryInfo(Path.GetDirectoryName(filePath)).Create();
 
-            using (StreamWriter outputFile = new StreamWriter(filePath))
-            using (var wrt = new CsvWriter(outputFile, CultureInfo.CurrentCulture))
+            using StreamWriter outputFile = new StreamWriter(filePath);
+            using var wrt = new CsvWriter(outputFile, CultureInfo.CurrentCulture);
+            wrt.WriteField("PermissionName");
+            wrt.WriteField("ApplicationPermission");
+            wrt.WriteField("DelegatePermission");
+            wrt.WriteField("Description");
+            wrt.WriteField("ApiCount");
+            wrt.WriteField("ApplicationGuid");
+            wrt.WriteField("DelegateGuid");            
+            wrt.WriteField("SourceFiles");
+            wrt.WriteField("View");
+            wrt.NextRecord();
+
+            foreach (var perm in permMap)
             {
-                wrt.WriteField("PermissionName");
-                wrt.WriteField("ApplicationPermission");
-                wrt.WriteField("DelegatePermission");
-                wrt.WriteField("SourceFiles");
-                wrt.NextRecord();
-
-                foreach (var perm in permMap)
+                var item = perm.Value;
+                var permissionName = perm.Key;
+                var sourceFiles = string.Empty;
+                var applicationPermission = false.ToString();
+                var delegatePermission = false.ToString();
+                var applicationPermissionGuid = string.Empty;
+                var delegatePermissionGuid = string.Empty;
+                if (item.ApplicationPermission != null)
                 {
-                    var item = perm.Value;
-                    var permissionName = perm.Key;
-                    var sourceFiles = string.Empty;
-                    var applicationPermission = (item.ApplicationPermission != null).ToString();
-                    var delegatePermission = (item.DelegatePermission != null).ToString();
-
-                    if (item.DocPermissions != null && item.DocPermissions.Count > 0)
-                    {    
-                        foreach (var docPerm in item.DocPermissions)
-                        {
-                            sourceFiles += docPerm.SourceFile + "|";
-                        }
-                    }
-                    var length = sourceFiles.Length > 100 ? 100 : sourceFiles.Length;
-                    sourceFiles = sourceFiles.Substring(0, length);
-                    wrt.WriteField(permissionName);
-                    wrt.WriteField(applicationPermission);
-                    wrt.WriteField(delegatePermission);
-                    wrt.WriteField(sourceFiles);
-                    wrt.NextRecord();
+                    applicationPermission = true.ToString();
+                    applicationPermissionGuid = item.ApplicationPermission.id;
+                }
+                if (item.DelegatePermission != null)
+                {
+                    delegatePermission = true.ToString();
+                    delegatePermissionGuid = item.DelegatePermission.id;
                 }
 
+                if (item.DocPermissions != null && item.DocPermissions.Count > 0)
+                {
+                    foreach (var docPerm in item.DocPermissions)
+                    {
+                        sourceFiles += docPerm.SourceFile + "|";
+                    }
+                }
+                var length = sourceFiles.Length > 100 ? 100 : sourceFiles.Length;
+                sourceFiles = sourceFiles.Substring(0, length);
+
+                wrt.WriteField(permissionName);
+                wrt.WriteField(applicationPermission);
+                wrt.WriteField(delegatePermission);
+                wrt.WriteField(item.DisplayName);
+                wrt.WriteField(item.UriCount.ToString());
+                wrt.WriteField(applicationPermissionGuid);
+                wrt.WriteField(delegatePermissionGuid);
+                wrt.WriteField(sourceFiles);
+                wrt.WriteField($"https://graphpermissions.merill.net/permission/{permissionName}.html");
+                wrt.NextRecord();
             }
         }
     }

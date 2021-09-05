@@ -32,5 +32,24 @@ namespace GraphMarkdown.Infrastructure
             return await response.Content.ReadAsStringAsync();
 
         }
+
+        public static string GetMicrosoftGraphDocLink(string title, string docNameV1, string docNameBeta, bool isResource, bool isV1)
+        {
+            var apiVersion = "graph-rest-1.0";
+            var docName = docNameV1;
+            if (!isV1)
+            {
+                apiVersion = "graph-rest-beta";
+                docName = docNameBeta;
+            }
+            var resoucePath = isResource ? "resources/" : "";
+            var docUri = $"https://docs.microsoft.com/graph/api/{resoucePath}{docName}?view={apiVersion}&tabs=http";
+            return $"[{title}]({docUri})";
+        }
+
+        public static string GetGraphPermUri(string permissionName)
+        {
+            return $"https://graphpermissions.merill.net/permission/{permissionName}.html";
+        }
     }
 }
