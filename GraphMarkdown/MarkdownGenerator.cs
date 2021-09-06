@@ -261,7 +261,8 @@ namespace GraphMarkdown
                 if (permMap.DocPermissions.Count == 0)
                 {
                     var permissionUri = GraphHelper.GetGraphPermUri(permMap.PermissionName);
-                    if (permMap.ApplicationPermission == null)
+                    var wellKnownPermsWithNoAppPerm = "|openid|email|profile|offline_access|";
+                    if (permMap.ApplicationPermission == null && !wellKnownPermsWithNoAppPerm.Contains($"|{permMap.PermissionName}|", StringComparison.InvariantCultureIgnoreCase))
                     {
                         _logger.Warning($"AppPerm not in Doc [{permMap.PermissionName}]({permissionUri})");
                     }

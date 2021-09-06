@@ -139,11 +139,11 @@ namespace GraphMarkdown
                     }
                 }
             }
-
-            if (permissions.Count == 0)
+            var apiName = Path.GetFileNameWithoutExtension(filePath);
+            var apisWithNoPerms = "|application-addkey|application-removekey|applicationtemplate-get|applicationtemplate-list|";
+            if (permissions.Count == 0 && !apisWithNoPerms.Contains($"|{apiName}|", StringComparison.InvariantCultureIgnoreCase))
             {
-                var fileName = Path.GetFileNameWithoutExtension(filePath);
-                var uri = GraphHelper.GetMicrosoftGraphDocLink(fileName, fileName, fileName, false, !isBeta);
+                var uri = GraphHelper.GetMicrosoftGraphDocLink(apiName, apiName, apiName, false, !isBeta);
                 _logger.Warning($"No permissions found in {uri}");
             }
 
