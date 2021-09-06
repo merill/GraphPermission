@@ -25,11 +25,11 @@
       "default",
       "templates/material"
     ],
-    "postProcessors": ["ExtractSearchIndex"],
+    "postProcessors": [],
     "markdownEngineName": "markdig",
     "globalMetadata": {
       "_appTitle": "Graph Permissions",
-      "_enableSearch": "true"
+      "_enableSearch": "false"
     },
     "noLangKeyword": false,
     "keepFileLink": false,
