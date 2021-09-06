@@ -18,6 +18,18 @@
         ]
       }
     ],
+    "sitemap":{
+      "baseUrl": "https://graphpermissions.merill.net",
+      "priority": 0.1,
+      "changefreq": "daily",
+      "fileOptions":{
+          "**/*.md": {
+              "baseUrl": "https://graphpermissions.merill.net",
+              "priority": 0.8,
+              "changefreq": "daily"
+          }
+      }
+    },    
     "dest": "_site",
     "globalMetadataFiles": [],
     "fileMetadataFiles": [],
