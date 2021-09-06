@@ -41,7 +41,7 @@
     "markdownEngineName": "markdig",
     "globalMetadata": {
       "_appTitle": "Graph Permissions",
-      "_enableSearch": "false"
+      "_enableSearch": false
     },
     "noLangKeyword": false,
     "keepFileLink": false,
