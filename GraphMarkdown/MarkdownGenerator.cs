@@ -48,7 +48,7 @@ namespace GraphMarkdown
             var sbYml = new StringBuilder();
             var sbIndex = new StringBuilder();
 
-            sbIndex.AppendLine("# Graph Permission Explorer"); sbIndex.AppendLine();
+            sbIndex.AppendLine("# Microsoft Graph Permission Explorer"); sbIndex.AppendLine();
             sbIndex.AppendLine("Click on a permission below to view the APIs that are enabled and the data objects exposed to the calling application."); sbIndex.AppendLine();
 
             sbIndex.AppendLine("# Permission Scopes"); sbIndex.AppendLine();
