@@ -8,7 +8,16 @@ namespace GraphMarkdown.Infrastructure
 {
     public static class Csv
     {
-        public static void SavePermissionsToCsv(Dictionary<string, GraphPermissionMap> permMap, string filePath)
+        public static void SavePermissionsToCsv(Dictionary<string, GraphPermissionMap> permMap, List<DocGraphPermission> docGraphPermissions, string siteFolder)
+        {
+            var csvSummaryFilePath = Path.Combine(siteFolder, "permission.csv");
+            CreatePermissionSummary(permMap, csvSummaryFilePath);
+
+            var csvDetailFilePath = Path.Combine(siteFolder, "permissions.csv");
+            CreatePermissionDetail(docGraphPermissions, csvDetailFilePath);
+        }
+
+        private static void CreatePermissionSummary(Dictionary<string, GraphPermissionMap> permMap, string filePath)
         {
             new DirectoryInfo(Path.GetDirectoryName(filePath)).Create();
 
@@ -20,10 +29,9 @@ namespace GraphMarkdown.Infrastructure
             wrt.WriteField("Description");
             wrt.WriteField("ApiCount");
             wrt.WriteField("ApplicationGuid");
-            wrt.WriteField("DelegateGuid");            
+            wrt.WriteField("DelegateGuid");
             wrt.WriteField("SourceFiles");
             wrt.WriteField("View");
-            wrt.NextRecord();
 
             foreach (var perm in permMap)
             {
@@ -34,16 +42,6 @@ namespace GraphMarkdown.Infrastructure
                 var delegatePermission = false.ToString();
                 var applicationPermissionGuid = string.Empty;
                 var delegatePermissionGuid = string.Empty;
-                if (item.ApplicationPermission != null)
-                {
-                    applicationPermission = true.ToString();
-                    applicationPermissionGuid = item.ApplicationPermission.id;
-                }
-                if (item.DelegatePermission != null)
-                {
-                    delegatePermission = true.ToString();
-                    delegatePermissionGuid = item.DelegatePermission.id;
-                }
 
                 if (item.DocPermissions != null && item.DocPermissions.Count > 0)
                 {
@@ -64,6 +62,34 @@ namespace GraphMarkdown.Infrastructure
                 wrt.WriteField(delegatePermissionGuid);
                 wrt.WriteField(sourceFiles);
                 wrt.WriteField($"https://graphpermissions.merill.net/permission/{permissionName}.html");
+                wrt.NextRecord();
+            }
+        }
+
+        private static void CreatePermissionDetail(List<DocGraphPermission> docPermissions, string filePath)
+        {
+            new DirectoryInfo(Path.GetDirectoryName(filePath)).Create();
+
+            using StreamWriter outputFile = new StreamWriter(filePath);
+            using var wrt = new CsvWriter(outputFile, CultureInfo.CurrentCulture);
+
+            wrt.WriteField("PermissionName");
+            wrt.WriteField("ApplicationPermission");
+            wrt.WriteField("DelegatePermission");
+            wrt.WriteField("IsBeta");
+            wrt.WriteField("API");
+            wrt.WriteField("DocUri");
+            wrt.NextRecord();
+
+            foreach (var perm in docPermissions)
+            {
+                wrt.WriteField(perm.PermissionName);
+                wrt.WriteField(perm.IsApplicationPermission);
+                wrt.WriteField(perm.IsDelegatePermission);
+                wrt.WriteField(perm.IsBeta);
+                wrt.WriteField(perm.HttpRequest);
+                var docUri = GraphHelper.GetMicrosoftGraphDocLink(perm.SourceFile, perm.SourceFile, false, !perm.IsBeta);
+                wrt.WriteField(docUri);
                 wrt.NextRecord();
             }
         }

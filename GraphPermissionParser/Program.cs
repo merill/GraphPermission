@@ -22,7 +22,7 @@ namespace GraphPermissionParser
             {
                 var parser = new GraphDocParser(logger);
 
-                var permissions = parser.GetPermissionsInFolder(apiFolder);
+                var docPermissions = parser.GetPermissionsInFolder(apiFolder);
 
                 //var filePath = @"F:\code\microsoft-graph-docs\api-reference\beta\api\driveitem-get.md";
                 //var permissions = parser.GetPermissionsInFile(filePath, false);
@@ -32,10 +32,10 @@ namespace GraphPermissionParser
                 var config = GetConfig();
                 var mdg = new MarkdownGenerator(config, logger);
 
-                var permissionMap = await mdg.GenerateAsync(permissions, resources, docfxFolder);
+                var permissionMap = await mdg.GenerateAsync(docPermissions, resources, docfxFolder);
 
-                var csvFilePath = Path.Combine(siteFolder, "permission.csv");
-                Csv.SavePermissionsToCsv(permissionMap, csvFilePath);
+                
+                Csv.SavePermissionsToCsv(permissionMap, docPermissions, siteFolder);
             }
             catch (Exception ex)
             {

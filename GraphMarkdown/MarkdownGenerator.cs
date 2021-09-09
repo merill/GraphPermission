@@ -149,7 +149,7 @@ namespace GraphMarkdown
                 {
                     var res = resource.Value;
                     var name = string.IsNullOrEmpty(res.ResourceName) ? res.SourceFile : res.ResourceName;
-                    var docUri = GraphHelper.GetMicrosoftGraphDocLink(name.Replace("resource type", ""), res.SourceFile, res.SourceFile, true, !res.IsBeta);
+                    var docUri = GraphHelper.GetMicrosoftGraphDocLinkMarkdown(name.Replace("resource type", ""), res.SourceFile, res.SourceFile, true, !res.IsBeta);
                     sb.AppendLine($"### {docUri}");
                     sb.AppendLine(res.PropertiesMarkdown);
                 }
@@ -206,7 +206,7 @@ namespace GraphMarkdown
                                     p.IsApplication ? "A" :
                                     p.IsDelegate ? "D" : "";
 
-                    var docUri = GraphHelper.GetMicrosoftGraphDocLink(p.Uri, p.SourceDocV1, p.SourceDocBeta, false, p.IsV1);
+                    var docUri = GraphHelper.GetMicrosoftGraphDocLinkMarkdown(p.Uri, p.SourceDocV1, p.SourceDocBeta, false, p.IsV1);
                     sb.AppendLine($"|{version}|{permType}|{docUri}|");
                     
                 }

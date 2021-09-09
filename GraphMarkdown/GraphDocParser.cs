@@ -143,7 +143,7 @@ namespace GraphMarkdown
             var apisWithNoPerms = "|application-addkey|application-removekey|applicationtemplate-get|applicationtemplate-list|";
             if (permissions.Count == 0 && !apisWithNoPerms.Contains($"|{apiName}|", StringComparison.InvariantCultureIgnoreCase))
             {
-                var uri = GraphHelper.GetMicrosoftGraphDocLink(apiName, apiName, apiName, false, !isBeta);
+                var uri = GraphHelper.GetMicrosoftGraphDocLinkMarkdown(apiName, apiName, apiName, false, !isBeta);
                 _logger.Warning($"No permissions found in {uri}");
             }
 

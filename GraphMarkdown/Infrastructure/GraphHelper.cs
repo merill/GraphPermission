@@ -33,7 +33,14 @@ namespace GraphMarkdown.Infrastructure
 
         }
 
-        public static string GetMicrosoftGraphDocLink(string title, string docNameV1, string docNameBeta, bool isResource, bool isV1)
+        public static string GetMicrosoftGraphDocLinkMarkdown(string title, string docNameV1, string docNameBeta, bool isResource, bool isV1)
+        {
+            var docUri = GetMicrosoftGraphDocLink(docNameV1, docNameBeta, isResource, isV1);
+            
+            return $"[{title}]({docUri})";
+        }
+
+        public static string GetMicrosoftGraphDocLink(string docNameV1, string docNameBeta, bool isResource, bool isV1)
         {
             var apiVersion = "graph-rest-1.0";
             var docName = docNameV1;
@@ -43,9 +50,9 @@ namespace GraphMarkdown.Infrastructure
                 docName = docNameBeta;
             }
             var resoucePath = isResource ? "resources/" : "";
-            var docUri = $"https://docs.microsoft.com/graph/api/{resoucePath}{docName}?view={apiVersion}&tabs=http";
-            return $"[{title}]({docUri})";
+            return $"https://docs.microsoft.com/graph/api/{resoucePath}{docName}?view={apiVersion}&tabs=http";
         }
+
 
         public static string GetGraphPermUri(string permissionName)
         {
