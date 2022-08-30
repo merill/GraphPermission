@@ -21,9 +21,9 @@ jobs:
       env:
         ClientSecret: ${{ secrets.CLIENTSECRET }}    
     - name: Setup .NET
-      uses: actions/setup-dotnet@v1
+      uses: actions/setup-dotnet@v2
       with:
-        dotnet-version: 5.0.x
+        dotnet-version: 3.1.x
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
