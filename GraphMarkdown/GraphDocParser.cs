@@ -7,6 +7,7 @@ using Markdig.Syntax.Inlines;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -156,16 +157,16 @@ namespace GraphMarkdown
 
             //v1
             var v1FolderPath = Path.Combine(apiReferenceFolder, @"v1.0\api");
-            foreach (var filePath in Directory.GetFiles(v1FolderPath))
+            foreach (var filePath in Directory.GetFiles(v1FolderPath, "*.md"))
             {
                 permissions.AddRange(GetPermissionsInFile(filePath, false));
             }
 
             //beta
             var betaFolderPath = Path.Combine(apiReferenceFolder, @"beta\api");
-            foreach (var filePath in Directory.GetFiles(betaFolderPath))
+            foreach (var filePath in Directory.GetFiles(betaFolderPath, "*.md"))
             {
-                permissions.AddRange(GetPermissionsInFile(filePath, true));
+                permissions.AddRange(GetPermissionsInFile(filePath, false));
             }
             return permissions;
         }
@@ -177,7 +178,7 @@ namespace GraphMarkdown
             // Default to v1 resource and only use beta if a corresponding v1 is not available.
             // v1
             var v1FolderPath = Path.Combine(apiReferenceFolder, @"v1.0\resources");
-            foreach (var filePath in Directory.GetFiles(v1FolderPath))
+            foreach (var filePath in Directory.GetFiles(v1FolderPath, "*.md"))
             {
                 var resource = GetResourceInFile(filePath);
                 if (resource != null) { resources.Add(Path.GetFileNameWithoutExtension(filePath), resource); }
@@ -185,7 +186,7 @@ namespace GraphMarkdown
 
             // beta
             var betaFolderPath = Path.Combine(apiReferenceFolder, @"beta\resources");
-            foreach (var filePath in Directory.GetFiles(betaFolderPath))
+            foreach (var filePath in Directory.GetFiles(betaFolderPath, "*.md"))
             {
                 var resourceName = Path.GetFileNameWithoutExtension(filePath);
                 if (!resources.ContainsKey(resourceName))
@@ -205,7 +206,7 @@ namespace GraphMarkdown
             var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
 
             var doc = Markdown.Parse(md, pipeline);
-
+            Debug.WriteLine(filePath);
             var docResource = new DocResource()
             {
                 SourceFile = Path.GetFileNameWithoutExtension(filePath)
