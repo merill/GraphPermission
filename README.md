@@ -1,4 +1,4 @@
-# GraphPermission
+# Graph Permission
 This project hosts the source code that generates the [Graph Permissions Explorer](https://graphpermissions.merill.net) site.
 
 # Credits
