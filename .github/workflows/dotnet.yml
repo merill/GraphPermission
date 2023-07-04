@@ -34,7 +34,7 @@ jobs:
       uses: actions/checkout@master
       with:
         repository: microsoftgraph/microsoft-graph-docs
-        path: ./microsoft-graph-docs
+        path: ./d
     - name: Setup DocFX
       uses: crazy-max/ghaction-chocolatey@v1
       with:
@@ -43,7 +43,7 @@ jobs:
       run: tree
       shell: pwsh
     - name: Create Graph Permission Docs
-      run: .\outbin\GraphPermissionParser "$(Get-Location)/microsoft-graph-docs/api-reference" "$(Get-Location)\docfx_project"
+      run: .\outbin\GraphPermissionParser "$(Get-Location)/d/api-reference" "$(Get-Location)\docfx_project"
       shell: pwsh
     - name: DocFX Build
       run: docfx .\docfx_project\docfx.json
