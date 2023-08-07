@@ -22,10 +22,11 @@ namespace GraphPermissionParser
             {
                 var parser = new GraphDocParser(logger);
 
+                //var filePath = @"F:\gdocs\api-reference\beta\api\identitygovernance-taskprocessingresult-resume.md";
+                //var permissions = parser.GetPermissionsInFile(filePath, false);
+
                 var docPermissions = parser.GetPermissionsInFolder(apiFolder);
 
-                //var filePath = @"F:\code\microsoft-graph-docs\api-reference\beta\api\driveitem-get.md";
-                //var permissions = parser.GetPermissionsInFile(filePath, false);
 
                 var resources = parser.GetResourcesInFolder(apiFolder);
 

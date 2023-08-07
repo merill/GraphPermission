@@ -2,7 +2,7 @@
   "profiles": {
     "GraphPermissionParser": {
       "commandName": "Project",
-      "commandLineArgs": "F:\\code\\microsoft-graph-docs\\api-reference F:\\Code\\GraphPermission\\docfx_project"
+      "commandLineArgs": "F:\\gdocs\\api-reference F:\\Code\\GraphPermission\\docfx_project"
     }
   }
 }

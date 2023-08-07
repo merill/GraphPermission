@@ -79,6 +79,7 @@ namespace GraphMarkdown
                             permission += cell.Content.ToString();
                         }
                         permission = permission
+                                        .Replace("(See note below for least privileged)", ",", StringComparison.InvariantCultureIgnoreCase)
                                         .Replace("Role required to create subscription,Subscription.Read.All (see below).", "Subscription.Read.All", StringComparison.InvariantCultureIgnoreCase)
                                         .Replace("Role required to create subscription.", "", StringComparison.InvariantCultureIgnoreCase)
                                         .Replace("Permission required to create subscription.", "", StringComparison.InvariantCultureIgnoreCase)
@@ -113,7 +114,13 @@ namespace GraphMarkdown
                                 {
                                     if (!string.IsNullOrWhiteSpace(permItem))
                                     {
-                                        permList.Add(permItem); //Break out all spaces into seperate elements.
+                                        var cleanPerm = permItem.Trim();
+                                        if (cleanPerm.EndsWith(".") && cleanPerm.Length > 1) //Remove trailing period.
+                                        {
+                                            cleanPerm = cleanPerm.Substring(0, permItem.Length - 1);
+                                        }
+
+                                        permList.Add(cleanPerm); //Break out all spaces into seperate elements.
                                     }
                                 }
                             }

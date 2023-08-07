@@ -32,6 +32,7 @@ namespace GraphMarkdown.Infrastructure
             wrt.WriteField("DelegateGuid");
             wrt.WriteField("SourceFiles");
             wrt.WriteField("View");
+            wrt.NextRecord();
 
             foreach (var perm in permMap)
             {
