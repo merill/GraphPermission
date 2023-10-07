@@ -35,7 +35,7 @@ jobs:
     - name: Clone Microsoft Graph docs
       uses: actions/checkout@master
       with:
-        repository: microsoftgraph/microsoft-graph-docs
+        repository: microsoftgraph/microsoft-graph-docs-contrib
         path: ./d
     - name: Setup DocFX
       uses: crazy-max/ghaction-chocolatey@v1
