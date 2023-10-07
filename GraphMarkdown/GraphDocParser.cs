@@ -37,6 +37,11 @@ namespace GraphMarkdown
 
             var doc = Markdown.Parse(md, pipeline);
 
+            if (doc.Count == 0)
+            {
+                return new List<DocGraphPermission>(); //Empty markdown file.
+            }
+
             var permissions = ParsePermissions(filePath, isBeta, doc);
 
             var resources = (from p in doc.Descendants<LinkInline>()
